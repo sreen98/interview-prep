@@ -2,46 +2,244 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ==================== Base ==================== */
+
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  background-color: #ffffff;
-  color: #213547;
-
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
-  display: block;
   min-width: 320px;
   min-height: 100vh;
 }
 
 @layer base {
   body {
-    @apply bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300;
+    @apply bg-slate-50 text-slate-900 dark:bg-[#0a0a0f] dark:text-slate-100;
   }
 }
 
-.prose pre {
-  @apply bg-slate-100 dark:bg-slate-900 p-4 rounded-lg overflow-x-auto my-4;
+/* ==================== Scrollbar ==================== */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-.prose code {
-  @apply bg-slate-100 dark:bg-slate-900 px-1 rounded mx-1;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.prose h1 { @apply text-4xl font-bold mb-6 mt-8; }
-.prose h2 { @apply text-3xl font-bold mb-4 mt-8; }
-.prose h3 { @apply text-2xl font-bold mb-3 mt-6; }
-.prose p { @apply mb-4 leading-relaxed; }
-.prose ul { @apply list-disc pl-6 mb-4; }
-.prose li { @apply mb-1; }
-.prose a { @apply text-blue-600 dark:text-blue-400 hover:underline; }
+::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  @apply bg-slate-300 dark:bg-slate-700;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400 dark:bg-slate-600;
+}
+
+.sidebar-scroll::-webkit-scrollbar {
+  width: 3px;
+}
+
+/* ==================== Selection ==================== */
+
+::selection {
+  @apply bg-indigo-200 dark:bg-indigo-900/60 text-indigo-900 dark:text-indigo-100;
+}
+
+/* ==================== Content / Prose ==================== */
+
+.prose-container {
+  @apply text-slate-700 dark:text-slate-300;
+  line-height: 1.8;
+}
+
+.prose-container h1 {
+  @apply text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-6 mt-12 pb-4 border-b border-slate-200 dark:border-slate-800;
+}
+
+.prose-container h1:first-child {
+  @apply mt-0;
+}
+
+.prose-container h2 {
+  @apply text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-4 mt-10;
+}
+
+.prose-container h3 {
+  @apply text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100 mb-3 mt-8;
+}
+
+.prose-container h4 {
+  @apply text-lg font-bold text-slate-800 dark:text-slate-200 mb-2 mt-6;
+}
+
+.prose-container h5 {
+  @apply text-base font-bold text-slate-800 dark:text-slate-200 mb-2 mt-4;
+}
+
+.prose-container p {
+  @apply mb-4 leading-relaxed;
+}
+
+.prose-container > ul,
+.prose-container > ol {
+  @apply mb-6 pl-6;
+}
+
+.prose-container ul {
+  @apply list-disc;
+}
+
+.prose-container ol {
+  @apply list-decimal;
+}
+
+.prose-container li {
+  @apply mb-2 leading-relaxed;
+}
+
+.prose-container li > ul,
+.prose-container li > ol {
+  @apply mt-2 mb-0;
+}
+
+.prose-container li > p {
+  @apply mb-1;
+}
+
+.prose-container blockquote {
+  @apply border-l-4 border-indigo-400 dark:border-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/20 pl-4 pr-4 py-3 my-6 rounded-r-xl text-slate-600 dark:text-slate-400;
+}
+
+.prose-container blockquote p {
+  @apply mb-0;
+}
+
+.prose-container hr {
+  @apply my-10 border-slate-200 dark:border-slate-800;
+}
+
+.prose-container strong {
+  @apply font-bold text-slate-900 dark:text-white;
+}
+
+.prose-container em {
+  @apply italic;
+}
+
+.prose-container img {
+  @apply rounded-xl my-6 shadow-lg max-w-full;
+}
+
+/* ==================== Links ==================== */
+
+.content-link {
+  @apply text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 underline decoration-indigo-300/50 dark:decoration-indigo-600/50 underline-offset-2 hover:decoration-indigo-500 dark:hover:decoration-indigo-400 transition-colors;
+}
+
+/* ==================== Inline Code ==================== */
+
+.inline-code {
+  @apply px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[0.875em] font-mono text-pink-600 dark:text-pink-400 border border-slate-200/60 dark:border-slate-700/60;
+}
+
+/* ==================== Code Blocks ==================== */
+
+.code-block {
+  @apply my-6 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700/50 shadow-sm;
+  background: #22272e;
+}
+
+.code-block-header {
+  @apply flex items-center justify-between px-4 py-2.5;
+  background: #2d333b;
+  border-bottom: 1px solid rgba(99, 110, 123, 0.2);
+}
+
+.code-block-header .code-lang {
+  @apply text-xs font-mono uppercase tracking-wider;
+  color: #768390;
+}
+
+.code-block-header .copy-btn {
+  @apply flex items-center gap-1.5 text-xs transition-colors cursor-pointer;
+  color: #768390;
+  background: none;
+  border: none;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.code-block-header .copy-btn:hover {
+  color: #adbac7;
+  background: rgba(99, 110, 123, 0.15);
+}
+
+@media (hover: hover) {
+  .code-block-header .copy-btn {
+    opacity: 0;
+  }
+  .code-block:hover .copy-btn {
+    opacity: 1;
+  }
+}
+
+.code-block-body {
+  @apply p-4 overflow-x-auto text-sm leading-relaxed;
+  background: transparent !important;
+  margin: 0 !important;
+}
+
+.code-block-body code {
+  background: transparent !important;
+  font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.code-block-body .hljs {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+/* ==================== Tables ==================== */
+
+.prose-container table {
+  @apply w-full text-sm border-collapse;
+}
+
+.prose-container thead {
+  @apply bg-slate-50 dark:bg-slate-800/50;
+}
+
+.prose-container th {
+  @apply px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-300 border-b-2 border-slate-200 dark:border-slate-700;
+}
+
+.prose-container td {
+  @apply px-4 py-3 border-b border-slate-100 dark:border-slate-800;
+}
+
+.prose-container tbody tr {
+  @apply transition-colors;
+}
+
+.prose-container tbody tr:hover {
+  @apply bg-slate-50/80 dark:bg-slate-800/30;
+}
+
+/* ==================== Keyboard shortcuts ==================== */
+
+kbd {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
