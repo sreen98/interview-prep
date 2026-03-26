@@ -47,6 +47,203 @@ npx tsc --noEmit
 
 ---
 
+## 1.1 TypeScript Compilation — The 3 Core Stages
+
+When you "compile" TypeScript, the compiler (`tsc`) performs **three distinct jobs**. Understanding these is essential — interviewers test this to see if you truly know what TypeScript does under the hood versus what's marketing.
+
+### Stage 1: Type Checking (Static Analysis)
+
+The compiler analyzes your code against all type annotations, inferred types, and type constraints. It reports errors **without running the code** — this is the primary reason TypeScript exists.
+
+```typescript
+// Type checking catches these at compile time, not runtime:
+
+const age: number = "hello";
+// Error: Type 'string' is not assignable to type 'number'
+
+function greet(name: string): string {
+  return name.toUpperCase();
+}
+greet(42);
+// Error: Argument of type 'number' is not assignable to parameter of type 'string'
+
+interface User {
+  name: string;
+  email: string;
+}
+const user: User = { name: "Alice" };
+// Error: Property 'email' is missing in type '{ name: string; }' but required in type 'User'
+```
+
+**Key facts:**
+- Type checking is **entirely erased at runtime** — JavaScript has no concept of TypeScript types
+- The `strict` flag in `tsconfig.json` enables the strictest checking (recommended)
+- Type checking is the **slowest** part of compilation (must analyze the entire type graph)
+- You can run type checking alone with `tsc --noEmit` (no output files, just error reporting)
+
+### Stage 2: Transpilation (TypeScript → JavaScript)
+
+After type checking, the compiler **strips all type annotations** and converts TypeScript-specific syntax into plain JavaScript that browsers or Node.js can execute.
+
+```typescript
+// =================== INPUT (TypeScript) ===================
+interface User {
+  name: string;
+  age: number;
+}
+
+function greet(user: User): string {
+  return `Hello ${user.name}, age ${user.age}`;
+}
+
+const alice: User = { name: "Alice", age: 30 };
+console.log(greet(alice));
+
+enum Direction {
+  Up = "UP",
+  Down = "DOWN",
+}
+
+// =================== OUTPUT (JavaScript) ===================
+// Notice: ALL type annotations are gone. Interfaces are completely erased.
+
+function greet(user) {
+  return `Hello ${user.name}, age ${user.age}`;
+}
+
+const alice = { name: "Alice", age: 30 };
+console.log(greet(alice));
+
+// Enums are one of the few TS features that produce runtime code:
+var Direction;
+(function (Direction) {
+  Direction["Up"] = "UP";
+  Direction["Down"] = "DOWN";
+})(Direction || (Direction = {}));
+```
+
+**What gets erased (zero runtime cost):**
+- Type annotations (`: string`, `: number`, etc.)
+- Interfaces and type aliases
+- Generics (`<T>`)
+- `as` type assertions
+- Function overload signatures
+- `readonly` modifiers
+- Access modifiers (`public`, `private`, `protected`) — in terms of actual enforcement
+
+**What produces runtime JavaScript:**
+- Enums → become objects
+- Decorators → wrapper functions (experimental)
+- `class` features → constructor patterns (when targeting older ES versions)
+- `import`/`export` → `require`/`module.exports` (when targeting CommonJS)
+
+**Target configuration** — the `target` in `tsconfig.json` controls what JavaScript version the output uses:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES5",       // Output: var, function(), no arrow functions
+    "target": "ES2015",    // Output: let/const, arrow functions, classes
+    "target": "ES2020",    // Output: optional chaining, nullish coalescing
+    "target": "ESNext"     // Output: latest syntax, minimal transformation
+  }
+}
+```
+
+### Stage 3: Declaration File Generation (`.d.ts`)
+
+The compiler can generate **type declaration files** that describe the public API of your code — types only, no implementation. This is how TypeScript projects consume JavaScript libraries with type safety.
+
+```typescript
+// =================== SOURCE: math.ts ===================
+export function add(a: number, b: number): number {
+  return a + b;
+}
+
+export interface Vector {
+  x: number;
+  y: number;
+}
+
+export class Calculator {
+  private history: number[] = [];
+
+  calculate(a: number, b: number): number {
+    const result = a + b;
+    this.history.push(result);
+    return result;
+  }
+}
+
+// =================== GENERATED: math.d.ts ===================
+// Contains ONLY type information — no implementation code
+export declare function add(a: number, b: number): number;
+
+export interface Vector {
+  x: number;
+  y: number;
+}
+
+export declare class Calculator {
+  private history;
+  calculate(a: number, b: number): number;
+}
+```
+
+**When declaration files are needed:**
+- Publishing an npm package (so consumers get type support)
+- Sharing types across a monorepo
+- Using `allowJs` to type-check JavaScript files with JSDoc comments
+
+**When they're NOT needed:**
+- Application code (not a library) — you already have the source `.ts` files
+- Our PrepHub app doesn't generate `.d.ts` files (`noEmit: true`)
+
+Enable with:
+```json
+{
+  "compilerOptions": {
+    "declaration": true,       // Generate .d.ts files
+    "declarationDir": "./types" // Output directory
+  }
+}
+```
+
+### How Modern Tooling Splits These 3 Stages
+
+In practice, most modern projects **don't use `tsc` for everything**. They split the work across specialized tools for speed:
+
+| Stage | Tool | Speed | Why |
+|-------|------|-------|-----|
+| **Type Checking** | `tsc --noEmit` (or IDE) | Slow (~seconds) | Must analyze entire type graph — only `tsc` can do this |
+| **Transpilation** | **esbuild** (Vite), **SWC** (Next.js), or **Babel** | Very fast (~ms) | Just strips types — no type analysis needed |
+| **Declaration Files** | `tsc --emitDeclarationOnly` | Moderate | Only needed for libraries |
+
+```
+Traditional (tsc does everything):
+  .ts → [tsc] → type check + transpile + emit .d.ts → .js + .d.ts
+
+Modern (split pipeline, used by Vite/Next.js):
+  .ts → [esbuild/SWC] → strip types only (instant) → .js
+  .ts → [tsc --noEmit] → type check only (in IDE / CI)
+  .ts → [tsc --emitDeclarationOnly] → .d.ts (libraries only)
+```
+
+**Why the split?** `tsc` is written in JavaScript and is fundamentally slow for transpilation. esbuild (Go) and SWC (Rust) are 10-100x faster because they only strip types without analyzing them. The trade-off: they can't catch type errors — so you still need `tsc` for checking, but it runs separately (in your IDE or CI pipeline).
+
+### Interview Quick Summary
+
+| Question | Answer |
+|----------|--------|
+| What does TypeScript compile to? | Plain JavaScript — all types are erased at runtime |
+| Does TypeScript run in the browser? | No — it must be compiled to JavaScript first |
+| What are the 3 compilation outputs? | Type errors (checking), `.js` files (transpilation), `.d.ts` files (declarations) |
+| Is there a runtime cost to TypeScript types? | Zero — types are completely erased. Only enums and decorators produce runtime code |
+| Why do projects use esbuild/SWC instead of tsc? | 10-100x faster transpilation. Type checking is separate (`tsc --noEmit` in CI) |
+| What's the difference between `tsc` and Babel for TS? | `tsc` type-checks + transpiles. Babel only strips types (no checking) |
+
+---
+
 ## 2. Basic Types
 
 ### 2.1 Primitives

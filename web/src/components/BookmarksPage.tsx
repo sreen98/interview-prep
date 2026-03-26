@@ -6,8 +6,8 @@ import { useBookmarks } from '../hooks/useBookmarks';
 
 export default function BookmarksPage() {
   const { bookmarks, removeBookmark, clearAll, getByGuide } = useBookmarks();
-  const grouped = getByGuide();
-  const guideNames = Object.keys(grouped);
+  const grouped: Record<string, any[]> = getByGuide();
+  const guideNames: string[] = Object.keys(grouped);
 
   if (bookmarks.length === 0) {
     return (
@@ -42,7 +42,7 @@ export default function BookmarksPage() {
         </button>
       </div>
 
-      {guideNames.map(guideName => (
+      {guideNames.map((guideName: string) => (
         <motion.div
           key={guideName}
           initial={{ opacity: 0, y: 10 }}
@@ -53,7 +53,7 @@ export default function BookmarksPage() {
             {guideName}
           </h3>
           <div className="space-y-1.5">
-            {grouped[guideName].map(bookmark => (
+            {grouped[guideName].map((bookmark: any) => (
               <div
                 key={bookmark.id}
                 className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 group hover:border-indigo-200 dark:hover:border-indigo-800 transition-colors"
@@ -68,7 +68,7 @@ export default function BookmarksPage() {
                   </Link>
                   <span className="text-[11px] text-slate-400">
                     {bookmark.type === 'heading' ? 'Section' : 'Quiz Question'}
-                    {bookmark.createdAt && ` · ${new Date(bookmark.createdAt).toLocaleDateString()}`}
+                    {bookmark.createdAt && ` \u00B7 ${new Date(bookmark.createdAt).toLocaleDateString()}`}
                   </span>
                 </div>
                 <button

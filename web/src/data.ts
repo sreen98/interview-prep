@@ -1,8 +1,62 @@
-import { Monitor, Braces, Server, Layers, Cloud } from 'lucide-react';
+import { Monitor, Braces, Server, Layers, Cloud, Binary, Users, GitCompare } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { type ReactNode, isValidElement } from 'react';
 
-export const contentFiles = import.meta.glob('./content/**/*.md', { query: '?raw', import: 'default', eager: true });
+// ==================== Interfaces ====================
 
-export const menuStructure = [
+export interface OfficialDoc {
+  label: string;
+  url: string;
+}
+
+export interface MenuItem {
+  name: string;
+  path: string;
+  file: string;
+  officialDocs?: OfficialDoc[];
+}
+
+export interface MenuSection {
+  name: string;
+  path?: string;
+  file?: string;
+  icon?: LucideIcon;
+  gradient?: string;
+  lightBg?: string;
+  darkBg?: string;
+  accent?: string;
+  description?: string;
+  items?: MenuItem[];
+}
+
+export interface CheatSheet {
+  name: string;
+  path: string;
+  file: string;
+  color: string;
+  description: string;
+}
+
+export interface Question {
+  id: string;
+  question: string;
+  answer: string;
+  guide: string;
+  type: 'output' | 'conceptual';
+  difficulty?: string;
+}
+
+export interface Heading {
+  level: number;
+  text: string;
+  id: string;
+}
+
+// ==================== Data ====================
+
+export const contentFiles: Record<string, string> = import.meta.glob('./content/**/*.md', { query: '?raw', import: 'default', eager: true });
+
+export const menuStructure: MenuSection[] = [
   { name: 'Introduction', path: '/', file: './content/README.md' },
   {
     name: 'Front End',
@@ -18,6 +72,7 @@ export const menuStructure = [
       { name: 'Redux Saga', path: '/frontend/redux-saga', file: './content/front-end/redux-saga-guide.md', officialDocs: [{ label: 'Redux-Saga', url: 'https://redux-saga.js.org' }] },
       { name: 'TanStack Query', path: '/frontend/tanstack-query', file: './content/front-end/tanstack-query-guide.md', officialDocs: [{ label: 'TanStack Query', url: 'https://tanstack.com/query/latest' }] },
       { name: 'Storybook', path: '/frontend/storybook', file: './content/front-end/storybook-guide.md', officialDocs: [{ label: 'Storybook', url: 'https://storybook.js.org/docs' }] },
+      { name: 'React Comparisons', path: '/frontend/comparisons', file: './content/front-end/react-comparisons.md', officialDocs: [] },
     ]
   },
   {
@@ -31,6 +86,7 @@ export const menuStructure = [
     items: [
       { name: 'JavaScript Guide', path: '/javascript/guide', file: './content/javascript-and-typescript/javascript-guide.md', officialDocs: [{ label: 'MDN JavaScript', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript' }] },
       { name: 'TypeScript Guide', path: '/javascript/typescript', file: './content/javascript-and-typescript/typescript-guide.md', officialDocs: [{ label: 'TypeScript', url: 'https://www.typescriptlang.org/docs' }] },
+      { name: 'JS Comparisons', path: '/javascript/comparisons', file: './content/javascript-and-typescript/js-comparisons.md', officialDocs: [] },
     ]
   },
   {
@@ -47,6 +103,7 @@ export const menuStructure = [
       { name: 'MongoDB Guide', path: '/backend/mongodb', file: './content/back-end/mongodb-guide.md', officialDocs: [{ label: 'MongoDB Manual', url: 'https://www.mongodb.com/docs/manual' }] },
       { name: 'API Design', path: '/backend/api-design', file: './content/back-end/api-design-guide.md', officialDocs: [{ label: 'OpenAPI Spec', url: 'https://swagger.io/specification' }] },
       { name: 'Database Schema', path: '/backend/database-schema', file: './content/back-end/database-schema-guide.md', officialDocs: [{ label: 'MongoDB Data Modeling', url: 'https://www.mongodb.com/docs/manual/data-modeling' }] },
+      { name: 'Backend Comparisons', path: '/backend/comparisons', file: './content/back-end/backend-comparisons.md', officialDocs: [] },
     ]
   },
   {
@@ -64,6 +121,31 @@ export const menuStructure = [
       { name: 'Lambda', path: '/aws/lambda', file: './content/aws/aws-lambda-guide.md', officialDocs: [{ label: 'AWS Lambda', url: 'https://docs.aws.amazon.com/lambda/latest/dg' }] },
       { name: 'CloudWatch & Monitoring', path: '/aws/cloudwatch', file: './content/aws/aws-cloudwatch-guide.md', officialDocs: [{ label: 'AWS CloudWatch', url: 'https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring' }] },
       { name: 'Frontend Deployment', path: '/aws/frontend-deployment', file: './content/aws/aws-frontend-deployment-guide.md', officialDocs: [{ label: 'AWS CloudFront', url: 'https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide' }] },
+      { name: 'AWS Comparisons', path: '/aws/comparisons', file: './content/aws/aws-comparisons.md', officialDocs: [] },
+    ]
+  },
+  {
+    name: 'DSA',
+    icon: Binary,
+    gradient: 'from-rose-500 to-pink-400',
+    lightBg: 'bg-rose-50',
+    darkBg: 'dark:bg-rose-950/30',
+    accent: 'text-rose-600 dark:text-rose-400',
+    description: 'Data structures, algorithms & coding patterns',
+    items: [
+      { name: 'DSA Guide', path: '/dsa/guide', file: './content/dsa/dsa-guide.md', officialDocs: [] },
+    ]
+  },
+  {
+    name: 'Behavioral',
+    icon: Users,
+    gradient: 'from-teal-500 to-cyan-400',
+    lightBg: 'bg-teal-50',
+    darkBg: 'dark:bg-teal-950/30',
+    accent: 'text-teal-600 dark:text-teal-400',
+    description: 'STAR method, leadership principles & soft skills',
+    items: [
+      { name: 'Behavioral Guide', path: '/behavioral/guide', file: './content/behavioral/behavioral-guide.md', officialDocs: [] },
     ]
   },
   {
@@ -76,13 +158,14 @@ export const menuStructure = [
     description: 'Scalability, distributed systems & architecture',
     items: [
       { name: 'System Design Guide', path: '/system-design/guide', file: './content/system-design/system-design-guide.md', officialDocs: [] },
+      { name: 'Design Comparisons', path: '/system-design/comparisons', file: './content/system-design/sysdesign-comparisons.md', officialDocs: [] },
     ]
   }
 ];
 
 // ==================== Utilities ====================
 
-export function slugify(text) {
+export function slugify(text: string): string {
   return text
     .toLowerCase()
     .replace(/[^\w\s-]/g, '')
@@ -91,20 +174,20 @@ export function slugify(text) {
     .replace(/^-|-$/g, '');
 }
 
-export function getTextContent(children) {
+export function getTextContent(children: ReactNode): string {
   if (typeof children === 'string') return children;
   if (typeof children === 'number') return String(children);
   if (Array.isArray(children)) return children.map(getTextContent).join('');
-  if (children && typeof children === 'object' && children.props?.children) {
-    return getTextContent(children.props.children);
+  if (isValidElement(children) && children.props) {
+    return getTextContent((children.props as { children?: ReactNode }).children);
   }
   return '';
 }
 
-export function extractHeadings(markdown) {
-  const headings = [];
+export function extractHeadings(markdown: string): Heading[] {
+  const headings: Heading[] = [];
   const regex = /^(#{2,4})\s+(.+)$/gm;
-  let match;
+  let match: RegExpExecArray | null;
   while ((match = regex.exec(markdown)) !== null) {
     const raw = match[2]
       .replace(/\*\*/g, '')
@@ -120,13 +203,13 @@ export function extractHeadings(markdown) {
   return headings;
 }
 
-export function escapeRegex(str) {
+export function escapeRegex(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 // ==================== Reading Time ====================
 
-export function estimateReadingTime(markdown) {
+export function estimateReadingTime(markdown: string): number {
   if (!markdown) return 1;
   // Separate code blocks from prose
   let codeWords = 0;
@@ -148,28 +231,33 @@ export function estimateReadingTime(markdown) {
 
 // ==================== Quiz Q&A Parser ====================
 
-function parseDifficultyRanges(content) {
-  const ranges = [];
+interface DifficultyRange {
+  difficulty: string;
+  startIndex: number;
+}
+
+function parseDifficultyRanges(content: string): DifficultyRange[] {
+  const ranges: DifficultyRange[] = [];
   const regex = /^### (Beginner|Intermediate|Advanced)(?:\s*\(.*?\))?\s*$/gm;
-  let match;
+  let match: RegExpExecArray | null;
   while ((match = regex.exec(content)) !== null) {
     ranges.push({ difficulty: match[1].toLowerCase(), startIndex: match.index });
   }
   return ranges;
 }
 
-function getDifficulty(questionIndex, difficultyRanges) {
-  if (difficultyRanges.length === 0) return null;
+function getDifficulty(questionIndex: number, difficultyRanges: DifficultyRange[]): string | undefined {
+  if (difficultyRanges.length === 0) return undefined;
   for (let i = difficultyRanges.length - 1; i >= 0; i--) {
     if (questionIndex >= difficultyRanges[i].startIndex) {
       return difficultyRanges[i].difficulty;
     }
   }
-  return null;
+  return undefined;
 }
 
-export function extractQuestions(content, guideName) {
-  const questions = [];
+export function extractQuestions(content: string, guideName: string): Question[] {
+  const questions: Question[] = [];
   const difficultyRanges = parseDifficultyRanges(content);
 
   // Pattern 1: JS Interview Prep style — ## QN + code block + output + explanation
@@ -193,7 +281,7 @@ export function extractQuestions(content, guideName) {
           ].filter(Boolean).join('\n'),
           guide: guideName,
           type: 'output',
-          difficulty: getDifficulty(m.index, difficultyRanges),
+          difficulty: getDifficulty(m.index!, difficultyRanges),
         });
       }
     }
@@ -213,7 +301,7 @@ export function extractQuestions(content, guideName) {
         answer,
         guide: guideName,
         type: 'conceptual',
-        difficulty: getDifficulty(m.index, difficultyRanges),
+        difficulty: getDifficulty(m.index!, difficultyRanges),
       });
     }
   }
@@ -221,8 +309,8 @@ export function extractQuestions(content, guideName) {
   return questions;
 }
 
-export function getAllQuestions() {
-  const questions = [];
+export function getAllQuestions(): Question[] {
+  const questions: Question[] = [];
   for (const section of menuStructure) {
     if (!section.items) continue;
     for (const item of section.items) {
@@ -236,7 +324,7 @@ export function getAllQuestions() {
 
 // ==================== Cheat Sheets ====================
 
-export const cheatSheets = [
+export const cheatSheets: CheatSheet[] = [
   { name: 'React Hooks', path: '/cheatsheets/react-hooks', file: './content/cheatsheets/react-hooks.md', color: 'blue', description: 'useState, useEffect, useRef, useMemo, custom hooks' },
   { name: 'JavaScript ES6+', path: '/cheatsheets/javascript-es6', file: './content/cheatsheets/javascript-es6.md', color: 'amber', description: 'Destructuring, spread, promises, modules, optional chaining' },
   { name: 'Git Commands', path: '/cheatsheets/git-commands', file: './content/cheatsheets/git-commands.md', color: 'orange', description: 'Branching, merging, rebasing, undoing, remotes' },
@@ -247,7 +335,7 @@ export const cheatSheets = [
 
 // ==================== Text-to-Speech ====================
 
-export function extractProseText(markdown) {
+export function extractProseText(markdown: string): string[] {
   let text = markdown.replace(/```[\s\S]*?```/g, '');
   text = text.replace(/^#{1,6}\s+/gm, '');
   text = text.replace(/\*\*|__|~~|`/g, '');

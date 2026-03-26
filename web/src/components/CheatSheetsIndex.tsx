@@ -4,7 +4,14 @@ import { ArrowLeft, FileText } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cheatSheets } from '../data';
 
-const colors = {
+interface ColorScheme {
+  bg: string;
+  text: string;
+  border: string;
+  gradient: string;
+}
+
+const colors: Record<string, ColorScheme> = {
   blue: { bg: 'bg-blue-50 dark:bg-blue-950/30', text: 'text-blue-600 dark:text-blue-400', border: 'border-blue-200 dark:border-blue-800/50', gradient: 'from-blue-500 to-cyan-400' },
   amber: { bg: 'bg-amber-50 dark:bg-amber-950/30', text: 'text-amber-600 dark:text-amber-400', border: 'border-amber-200 dark:border-amber-800/50', gradient: 'from-amber-500 to-orange-400' },
   orange: { bg: 'bg-orange-50 dark:bg-orange-950/30', text: 'text-orange-600 dark:text-orange-400', border: 'border-orange-200 dark:border-orange-800/50', gradient: 'from-orange-500 to-red-400' },
@@ -23,8 +30,8 @@ export default function CheatSheetsIndex() {
       <p className="text-slate-500 dark:text-slate-400 mb-8">Quick reference cards for common interview topics. Concise, scannable, printable.</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {cheatSheets.map((cs, i) => {
-          const c = colors[cs.color] || colors.blue;
+        {cheatSheets.map((cs: any, i: number) => {
+          const c: ColorScheme = colors[cs.color] || colors.blue;
           return (
             <motion.div
               key={cs.path}

@@ -138,7 +138,7 @@ const PreBlock = ({ children }) => {
 
 // ==================== Table of Contents ====================
 
-const TableOfContents = ({ content }) => {
+const TableOfContents = ({ content, isCollapsed, onToggle }) => {
   const [activeId, setActiveId] = useState('');
 
   const headings = useMemo(() => {
@@ -175,12 +175,30 @@ const TableOfContents = ({ content }) => {
 
   if (headings.length < 4) return null;
 
+  // Expand tab when collapsed
+  if (isCollapsed) {
+    return (
+      <button
+        onClick={onToggle}
+        className="hidden xl:flex fixed top-1/2 -translate-y-1/2 right-0 z-[55] py-3 px-1 rounded-l-lg bg-slate-200/80 dark:bg-slate-800/80 border border-r-0 border-slate-300 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700 hover:px-2 transition-all"
+        title="Show table of contents"
+      >
+        <PanelLeftOpen size={14} className="text-slate-500 dark:text-slate-400 rotate-180" />
+      </button>
+    );
+  }
+
   return (
-    <aside className="hidden xl:block w-56 fixed top-0 right-0 h-screen overflow-y-auto pt-8 pb-8 pl-4 pr-4 sidebar-scroll">
+    <aside className="hidden xl:block w-60 fixed top-0 right-0 h-screen overflow-y-auto pt-8 pb-8 pl-5 pr-4 sidebar-scroll bg-slate-50 dark:bg-[#0a0a0f] border-l border-slate-200/50 dark:border-slate-800/50">
       <div className="border-l-2 border-slate-200 dark:border-slate-800 pl-4">
-        <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-4">
-          On this page
-        </h4>
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+            On this page
+          </h4>
+          <button onClick={onToggle} className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" title="Hide table of contents">
+            <PanelLeftClose size={12} className="text-slate-400 rotate-180" />
+          </button>
+        </div>
         <nav className="space-y-0.5">
           {headings.map((heading) => (
             <button
@@ -641,12 +659,81 @@ const ContentPage = ({ filePath, guidePath, guideName }) => {
   const containerRef = useRef(null);
   const [highlightCount, setHighlightCount] = useState(0);
   const [toastMsg, setToastMsg] = useState(null);
+  const [isTocCollapsed, setIsTocCollapsed] = useState(false);
   const { getStatus, markInProgress, toggleComplete } = useProgress();
   const { isBookmarked, toggleBookmark } = useBookmarks();
   const { recordGuideCompleted } = useStudyStats();
   const tts = useTextToSpeech();
   const proseParagraphs = useMemo(() => extractProseText(content), [content]);
   const guideStatus = guidePath ? getStatus(guidePath) : null;
+
+  // ===== Feature 1: Reading Position Memory =====
+  const scrollSaveTimer = useRef(null);
+
+  useEffect(() => {
+    // Restore scroll position after content renders
+    const restoreTimer = setTimeout(() => {
+      try {
+        const saved = JSON.parse(localStorage.getItem('reading-positions') || '{}');
+        const savedY = saved[filePath];
+        if (savedY && savedY > 0) {
+          window.scrollTo(0, savedY);
+        }
+      } catch { /* ignore parse errors */ }
+    }, 150);
+
+    // Save scroll position on scroll (debounced)
+    const handleScroll = () => {
+      if (scrollSaveTimer.current) clearTimeout(scrollSaveTimer.current);
+      scrollSaveTimer.current = setTimeout(() => {
+        try {
+          const positions = JSON.parse(localStorage.getItem('reading-positions') || '{}');
+          positions[filePath] = window.scrollY;
+          localStorage.setItem('reading-positions', JSON.stringify(positions));
+        } catch { /* ignore storage errors */ }
+      }, 300);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      clearTimeout(restoreTimer);
+      if (scrollSaveTimer.current) clearTimeout(scrollSaveTimer.current);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [filePath]);
+
+  // ===== Feature 2: Related Guides Suggestions =====
+  const relatedGuides = useMemo(() => {
+    if (!guidePath) return [];
+    // Find current category
+    let currentCategory = null;
+    let currentCategoryIndex = -1;
+    const categoriesWithItems = menuStructure.filter(s => s.items);
+    for (let i = 0; i < categoriesWithItems.length; i++) {
+      if (categoriesWithItems[i].items.some(item => item.path === guidePath)) {
+        currentCategory = categoriesWithItems[i];
+        currentCategoryIndex = i;
+        break;
+      }
+    }
+    if (!currentCategory) return [];
+
+    // Get other guides from same category
+    let related = currentCategory.items.filter(item => item.path !== guidePath);
+
+    // If fewer than 2, pull from adjacent categories
+    if (related.length < 2) {
+      const adjacentIndices = [currentCategoryIndex - 1, currentCategoryIndex + 1].filter(
+        i => i >= 0 && i < categoriesWithItems.length
+      );
+      for (const idx of adjacentIndices) {
+        if (related.length >= 3) break;
+        related = related.concat(categoriesWithItems[idx].items.slice(0, 3 - related.length));
+      }
+    }
+
+    return related.slice(0, 3);
+  }, [guidePath]);
 
   // Auto-mark in-progress on visit
   useEffect(() => {
@@ -767,13 +854,13 @@ const ContentPage = ({ filePath, guidePath, guideName }) => {
   }, [guidePath, guideName, isBookmarked, toggleBookmark]);
 
   return (
-    <div className="flex">
+    <>
       <motion.div
         key={filePath}
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="flex-1 min-w-0 px-6 py-8 md:px-12 md:py-12 max-w-4xl"
+        className={cn("px-6 py-8 md:px-12 md:py-12", !isTocCollapsed && "xl:mr-64")}
       >
         {/* Search highlight banner */}
         {searchQuery && highlightCount > 0 && (
@@ -878,11 +965,49 @@ const ContentPage = ({ filePath, guidePath, guideName }) => {
             {content}
           </ReactMarkdown>
         </div>
+
+        {/* Feature 2: Related Guides Suggestions */}
+        {relatedGuides.length > 0 && (
+          <div className="mt-12 pt-8 border-t border-slate-200 dark:border-slate-800">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-4 flex items-center gap-2">
+              <BookOpen size={14} />
+              Continue Learning
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {relatedGuides.map(guide => {
+                const readTime = estimateReadingTime(contentFiles[guide.file] || '');
+                const category = menuStructure.find(s => s.items?.some(i => i.path === guide.path));
+                return (
+                  <Link
+                    key={guide.path}
+                    to={guide.path}
+                    className="group p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 hover:-translate-y-0.5 transition-all duration-200"
+                  >
+                    <div className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                      {guide.name}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      {category && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                          {category.name}
+                        </span>
+                      )}
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 flex items-center gap-1">
+                        <Clock size={10} />
+                        ~{readTime}m
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </motion.div>
 
-      <TableOfContents content={content} />
+      <TableOfContents content={content} isCollapsed={isTocCollapsed} onToggle={() => setIsTocCollapsed(c => !c)} />
       <Toast message={toastMsg} onClose={() => setToastMsg(null)} />
-    </div>
+    </>
   );
 };
 
@@ -961,7 +1086,12 @@ export default function App() {
 
   useEffect(() => {
     setIsSidebarOpen(false);
-    window.scrollTo(0, 0);
+    // Only scroll to top for non-content pages; content pages restore their saved reading position
+    const isGuide = menuStructure.some(s => s.items?.some(i => i.path === location.pathname));
+    const isCheatsheet = cheatSheets.some(cs => cs.path === location.pathname);
+    if (!isGuide && !isCheatsheet) {
+      window.scrollTo(0, 0);
+    }
   }, [location.pathname]);
 
   useEffect(() => {
@@ -975,12 +1105,43 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // ===== Feature 3: Keyboard Navigation =====
+  const navigate = useNavigate();
+  const flatGuidePaths = useMemo(() => {
+    return menuStructure.flatMap(section => (section.items || []).map(item => item.path));
+  }, []);
+
+  useEffect(() => {
+    const handleArrowNav = (e) => {
+      if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+
+      // Don't navigate when focus is in an input, textarea, or search-related element
+      const tag = document.activeElement?.tagName?.toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || document.activeElement?.isContentEditable) return;
+
+      const currentIndex = flatGuidePaths.indexOf(location.pathname);
+      if (currentIndex === -1) return;
+
+      e.preventDefault();
+      let nextIndex;
+      if (e.key === 'ArrowDown') {
+        nextIndex = currentIndex + 1 < flatGuidePaths.length ? currentIndex + 1 : 0;
+      } else {
+        nextIndex = currentIndex - 1 >= 0 ? currentIndex - 1 : flatGuidePaths.length - 1;
+      }
+      navigate(flatGuidePaths[nextIndex]);
+    };
+
+    window.addEventListener('keydown', handleArrowNav);
+    return () => window.removeEventListener('keydown', handleArrowNav);
+  }, [location.pathname, flatGuidePaths, navigate]);
+
   const toggleSection = (name) => {
     setExpandedSections(prev => ({ ...prev, [name]: !prev[name] }));
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-50 dark:bg-[#0a0a0f] text-slate-900 dark:text-slate-100 transition-colors duration-300">
+    <div className="flex min-h-screen bg-slate-50 dark:bg-[#0a0a0f] text-slate-900 dark:text-slate-100 transition-colors duration-300 overflow-x-hidden">
       <ReadingProgress />
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
       <BackToTop />
@@ -1037,9 +1198,9 @@ export default function App() {
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed md:sticky top-0 left-0 h-screen w-72 bg-white/95 dark:bg-[#0c0c14]/95 backdrop-blur-xl border-r border-slate-200/80 dark:border-slate-800/80 z-[70] transition-all duration-300 flex flex-col",
+        "fixed top-0 left-0 h-screen w-72 bg-white/95 dark:bg-[#0c0c14]/95 backdrop-blur-xl border-r border-slate-200/80 dark:border-slate-800/80 z-[70] transition-all duration-300 flex flex-col",
         !isSidebarOpen && "-translate-x-full",
-        isSidebarCollapsed ? "md:-translate-x-full md:w-0 md:border-0 md:overflow-hidden" : "md:translate-x-0"
+        isSidebarCollapsed ? "md:-translate-x-full" : "md:translate-x-0"
       )}>
         <div className="p-5 border-b border-slate-100 dark:border-slate-800/50">
           <div className="flex items-center justify-between">
@@ -1215,7 +1376,7 @@ export default function App() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 w-full min-w-0 pt-14 md:pt-0">
+      <main className={cn("flex-1 w-full min-w-0 pt-14 md:pt-0", !isSidebarCollapsed && "md:ml-72")}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/quiz" element={<QuizMode />} />

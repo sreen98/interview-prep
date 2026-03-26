@@ -1,19 +1,35 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 
-const STORAGE_KEY = 'tts-prefs';
+const STORAGE_KEY = 'tts-prefs' as const;
 
-function loadPrefs() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { rate: 1.0 }; }
+export interface TTSPrefs {
+  rate: number;
+}
+
+export interface UseTextToSpeechReturn {
+  speak: (paragraphs: string[]) => void;
+  pause: () => void;
+  resume: () => void;
+  stop: () => void;
+  isPlaying: boolean;
+  isPaused: boolean;
+  currentIndex: number;
+  rate: number;
+  setRate: (r: number) => void;
+}
+
+function loadPrefs(): TTSPrefs {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) as string) || { rate: 1.0 }; }
   catch { return { rate: 1.0 }; }
 }
 
-export function useTextToSpeech() {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(-1);
-  const [rate, setRateState] = useState(loadPrefs().rate);
-  const paragraphsRef = useRef([]);
-  const utteranceRef = useRef(null);
+export function useTextToSpeech(): UseTextToSpeechReturn {
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [currentIndex, setCurrentIndex] = useState<number>(-1);
+  const [rate, setRateState] = useState<number>(loadPrefs().rate);
+  const paragraphsRef = useRef<string[]>([]);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -22,12 +38,12 @@ export function useTextToSpeech() {
     };
   }, []);
 
-  const setRate = useCallback((r) => {
+  const setRate = useCallback((r: number): void => {
     setRateState(r);
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ rate: r }));
   }, []);
 
-  const speakParagraph = useCallback((index) => {
+  const speakParagraph = useCallback((index: number): void => {
     if (index >= paragraphsRef.current.length) {
       setIsPlaying(false);
       setIsPaused(false);
@@ -45,7 +61,7 @@ export function useTextToSpeech() {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = rate;
     utterance.onend = () => speakParagraph(index + 1);
-    utterance.onerror = (e) => {
+    utterance.onerror = (e: SpeechSynthesisErrorEvent) => {
       if (e.error !== 'canceled') {
         speakParagraph(index + 1);
       }
@@ -56,7 +72,7 @@ export function useTextToSpeech() {
     window.speechSynthesis.speak(utterance);
   }, [rate]);
 
-  const speak = useCallback((paragraphs) => {
+  const speak = useCallback((paragraphs: string[]): void => {
     window.speechSynthesis.cancel();
     paragraphsRef.current = paragraphs;
     setIsPlaying(true);
@@ -65,17 +81,17 @@ export function useTextToSpeech() {
     setTimeout(() => speakParagraph(0), 50);
   }, [speakParagraph]);
 
-  const pause = useCallback(() => {
+  const pause = useCallback((): void => {
     window.speechSynthesis.pause();
     setIsPaused(true);
   }, []);
 
-  const resume = useCallback(() => {
+  const resume = useCallback((): void => {
     window.speechSynthesis.resume();
     setIsPaused(false);
   }, []);
 
-  const stop = useCallback(() => {
+  const stop = useCallback((): void => {
     window.speechSynthesis.cancel();
     setIsPlaying(false);
     setIsPaused(false);

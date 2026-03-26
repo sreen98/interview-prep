@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-let mermaidModule = null;
-let mermaidReady = false;
+let mermaidModule: any = null;
+let mermaidReady: boolean = false;
 
-async function getMermaid() {
+async function getMermaid(): Promise<any> {
   if (!mermaidModule) {
     mermaidModule = (await import('mermaid')).default;
   }
@@ -20,11 +20,15 @@ async function getMermaid() {
   return mermaidModule;
 }
 
-let counter = 0;
+let counter: number = 0;
 
-export default function MermaidBlock({ chart }) {
-  const [svg, setSvg] = useState('');
-  const [error, setError] = useState(null);
+interface MermaidBlockProps {
+  chart: string;
+}
+
+export default function MermaidBlock({ chart }: MermaidBlockProps) {
+  const [svg, setSvg] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -32,13 +36,13 @@ export default function MermaidBlock({ chart }) {
 
     getMermaid()
       .then(mermaid => mermaid.render(id, chart.trim()))
-      .then(({ svg: renderedSvg }) => {
+      .then(({ svg: renderedSvg }: { svg: string }) => {
         if (!cancelled) {
           setSvg(renderedSvg);
           setError(null);
         }
       })
-      .catch((err) => {
+      .catch((err: any) => {
         if (!cancelled) {
           setError(err?.message || 'Failed to render diagram');
           setSvg('');

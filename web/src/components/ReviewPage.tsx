@@ -5,7 +5,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ThumbsUp, ThumbsDown, ChevronLeft, ChevronRight, RotateCcw, CalendarCheck } from 'lucide-react';
-import { getAllQuestions } from '../data';
+import { getAllQuestions, type Question } from '../data';
 import { useSpacedRepetition } from '../hooks/useSpacedRepetition';
 import { useStudyStats } from '../hooks/useStudyStats';
 
@@ -13,23 +13,23 @@ export default function ReviewPage() {
   const { getDueQuestions, recordReview } = useSpacedRepetition();
   const { recordQuestionReviewed } = useStudyStats();
 
-  const dueQuestions = useMemo(() => getDueQuestions(getAllQuestions()), [getDueQuestions]);
+  const dueQuestions = useMemo(() => getDueQuestions(getAllQuestions() as any) as unknown as Question[], [getDueQuestions]);
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [reviewed, setReviewed] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [isFlipped, setIsFlipped] = useState<boolean>(false);
+  const [reviewed, setReviewed] = useState<number>(0);
 
-  const current = dueQuestions[currentIndex];
-  const total = dueQuestions.length;
+  const current: Question | undefined = dueQuestions[currentIndex];
+  const total: number = dueQuestions.length;
 
-  const handleScore = useCallback((knew) => {
+  const handleScore = useCallback((knew: boolean) => {
     if (current) {
       recordReview(current.id, knew ? 4 : 1);
       recordQuestionReviewed();
-      setReviewed(r => r + 1);
+      setReviewed((r: number) => r + 1);
     }
     if (currentIndex < total - 1) {
-      setCurrentIndex(i => i + 1);
+      setCurrentIndex((i: number) => i + 1);
       setIsFlipped(false);
     } else {
       setCurrentIndex(total); // triggers completion
@@ -91,7 +91,7 @@ export default function ReviewPage() {
       {/* Flashcard */}
       <div className="mb-8">
         <div
-          onClick={() => setIsFlipped(f => !f)}
+          onClick={() => setIsFlipped((f: boolean) => !f)}
           className="cursor-pointer select-none"
           style={{ perspective: '1200px' }}
         >

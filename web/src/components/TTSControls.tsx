@@ -1,9 +1,19 @@
 import React from 'react';
 import { Play, Pause, Square, FastForward } from 'lucide-react';
 
-const SPEEDS = [0.75, 1, 1.25, 1.5];
+const SPEEDS: number[] = [0.75, 1, 1.25, 1.5];
 
-export default function TTSControls({ isPlaying, isPaused, rate, onPause, onResume, onStop, onSetRate }) {
+interface TTSControlsProps {
+  isPlaying: boolean;
+  isPaused: boolean;
+  rate: number;
+  onPause: () => void;
+  onResume: () => void;
+  onStop: () => void;
+  onSetRate: (rate: number) => void;
+}
+
+export default function TTSControls({ isPlaying, isPaused, rate, onPause, onResume, onStop, onSetRate }: TTSControlsProps) {
   if (!isPlaying) return null;
 
   return (

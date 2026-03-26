@@ -2,7 +2,13 @@ import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check } from 'lucide-react';
 
-export default function Toast({ message, onClose, duration = 2000 }) {
+interface ToastProps {
+  message: string | null;
+  onClose: () => void;
+  duration?: number;
+}
+
+export default function Toast({ message, onClose, duration = 2000 }: ToastProps) {
   useEffect(() => {
     if (!message) return;
     const timer = setTimeout(onClose, duration);

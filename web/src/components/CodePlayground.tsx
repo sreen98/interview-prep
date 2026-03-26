@@ -4,9 +4,33 @@ import { Link } from 'react-router-dom';
 import { Play, Trash2, ArrowLeft, AlertTriangle, Loader2, X, Search, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// ==================== Types ====================
+
+interface Template {
+  name: string;
+  code: string;
+  jsx?: boolean;
+}
+
+interface TemplateCategory {
+  label: string;
+  tag: string;
+  templates: Template[];
+}
+
+interface FlatTemplate extends Template {
+  category: string;
+  tag: string;
+}
+
+interface OutputEntry {
+  type: 'log' | 'warn' | 'error' | 'result';
+  text: string;
+}
+
 // ==================== Templates ====================
 
-const templateCategories = [
+const templateCategories: TemplateCategory[] = [
   {
     label: 'JavaScript Fundamentals',
     tag: 'JS',
@@ -312,9 +336,9 @@ render(<Counter />);`,
 
   return (
     <div style={{ textAlign: "center", padding: 24, fontFamily: "system-ui" }}>
-      <h2 style={{ fontSize: 48, margin: 0 }}>⏱ {seconds}s</h2>
+      <h2 style={{ fontSize: 48, margin: 0 }}>\u23F1 {seconds}s</h2>
       <button onClick={() => setRunning(r => !r)} style={{ marginTop: 16 }}>
-        {running ? "⏸ Pause" : "▶ Resume"}
+        {running ? "\u23F8 Pause" : "\u25B6 Resume"}
       </button>
       <p style={{ color: "#888", fontSize: 13, marginTop: 8 }}>Check console for lifecycle logs</p>
     </div>
@@ -360,7 +384,7 @@ function App() {
         </div>
       </div>
       <p style={{ color: "#888", fontSize: 12, marginTop: 16 }}>
-        Values persist in localStorage — try re-running!
+        Values persist in localStorage \u2014 try re-running!
       </p>
     </div>
   );
@@ -423,7 +447,7 @@ function TodoApp() {
           }}>
             <input type="checkbox" checked={t.done} onChange={() => dispatch({ type: "toggle", id: t.id })} />
             <span style={{ flex: 1 }}>{t.text}</span>
-            <button onClick={() => dispatch({ type: "delete", id: t.id })} style={{ color: "red", border: "none", background: "none", cursor: "pointer" }}>✕</button>
+            <button onClick={() => dispatch({ type: "delete", id: t.id })} style={{ color: "red", border: "none", background: "none", cursor: "pointer" }}>\u2715</button>
           </li>
         ))}
       </ul>
@@ -437,7 +461,7 @@ render(<TodoApp />);`,
       {
         name: 'Context API',
         jsx: true,
-        code: `// Theme context — no prop drilling
+        code: `// Theme context \u2014 no prop drilling
 const ThemeContext = React.createContext();
 
 function ThemeProvider({ children }) {
@@ -461,7 +485,7 @@ function Header() {
   return (
     <div style={{ padding: 16, borderBottom: "1px solid " + (theme.dark ? "#333" : "#eee"), display: "flex", justifyContent: "space-between" }}>
       <strong style={{ color: theme.accent }}>Context Demo</strong>
-      <button onClick={theme.toggle}>{theme.dark ? "☀️ Light" : "🌙 Dark"}</button>
+      <button onClick={theme.toggle}>{theme.dark ? "\u2600\uFE0F Light" : "\u{1F319} Dark"}</button>
     </div>
   );
 }
@@ -471,7 +495,7 @@ function Content() {
   return (
     <div style={{ padding: 16 }}>
       <p>Theme is: <strong>{theme.dark ? "Dark" : "Light"}</strong></p>
-      <p style={{ color: "#888", fontSize: 13 }}>Header and Content both read from ThemeContext — no props passed!</p>
+      <p style={{ color: "#888", fontSize: 13 }}>Header and Content both read from ThemeContext \u2014 no props passed!</p>
     </div>
   );
 }
@@ -501,7 +525,7 @@ render(
 // WITHOUT compiler:
 //   const filtered = useMemo(() => items.filter(...), [items, query]);
 //
-// WITH compiler — just write plain code:
+// WITH compiler \u2014 just write plain code:
 
 function ExpensiveList({ items, query }) {
   // Compiler auto-memoizes this computation
@@ -787,7 +811,7 @@ Array.prototype.myFlatMap = function(callback, thisArg) {
 const nested = [1, [2, 3], [4, [5, 6]]];
 console.log("flat(1):", nested.myFlat());
 console.log("flat(2):", nested.myFlat(2));
-console.log("flat(∞):", [1, [2, [3, [4, [5]]]]].myFlat(Infinity));
+console.log("flat(\u221E):", [1, [2, [3, [4, [5]]]]].myFlat(Infinity));
 
 // Test flatMap
 const sentences = ["Hello World", "Foo Bar"];
@@ -1009,20 +1033,20 @@ Promise.myAny = function(promises) {
   });
 };
 
-// Test: race — first to settle wins
+// Test: race \u2014 first to settle wins
 Promise.myRace([
   new Promise(r => setTimeout(() => r("slow"), 100)),
   new Promise(r => setTimeout(() => r("fast"), 10)),
 ]).then(v => console.log("Race winner:", v));
 
-// Test: any — first to fulfill wins (ignores rejections)
+// Test: any \u2014 first to fulfill wins (ignores rejections)
 Promise.myAny([
   Promise.reject("err1"),
   new Promise(r => setTimeout(() => r("success"), 50)),
   Promise.reject("err2"),
 ]).then(v => console.log("Any winner:", v));
 
-// Test: any — all reject
+// Test: any \u2014 all reject
 Promise.myAny([
   Promise.reject("a"),
   Promise.reject("b"),
@@ -1030,16 +1054,352 @@ Promise.myAny([
       },
     ],
   },
+  {
+    label: 'Coding Challenges',
+    tag: 'JS',
+    templates: [
+      {
+        name: 'Two Sum',
+        code: `// ===== CHALLENGE: Two Sum =====
+// Given an array of integers and a target,
+// return indices of the two numbers that add up to target.
+//
+// Example: twoSum([2, 7, 11, 15], 9) \u2192 [0, 1]
+//
+// Constraints:
+// - Each input has exactly one solution
+// - You may not use the same element twice
+
+function twoSum(nums, target) {
+  // YOUR CODE HERE
+
+}
+
+// ===== TEST CASES =====
+const test = (name, actual, expected) => {
+  const pass = JSON.stringify(actual) === JSON.stringify(expected);
+  console.log(pass ? "\u2705" : "\u274C", name, pass ? "" : \`Expected \${JSON.stringify(expected)}, got \${JSON.stringify(actual)}\`);
+};
+
+test("Example 1", twoSum([2, 7, 11, 15], 9), [0, 1]);
+test("Example 2", twoSum([3, 2, 4], 6), [1, 2]);
+test("Example 3", twoSum([3, 3], 6), [0, 1]);`,
+      },
+      {
+        name: 'Reverse String',
+        code: `// ===== CHALLENGE: Reverse String =====
+// Reverse a string without using the built-in reverse() method.
+//
+// Example: reverseString("hello") \u2192 "olleh"
+// Example: reverseString("world") \u2192 "dlrow"
+//
+// Constraints:
+// - Do not use Array.prototype.reverse()
+// - Try to do it in place (treat string as char array)
+
+function reverseString(str) {
+  // YOUR CODE HERE
+
+}
+
+// ===== TEST CASES =====
+const test = (name, actual, expected) => {
+  const pass = JSON.stringify(actual) === JSON.stringify(expected);
+  console.log(pass ? "\u2705" : "\u274C", name, pass ? "" : \`Expected \${JSON.stringify(expected)}, got \${JSON.stringify(actual)}\`);
+};
+
+test("Simple word", reverseString("hello"), "olleh");
+test("Another word", reverseString("world"), "dlrow");
+test("Single char", reverseString("a"), "a");
+test("Empty string", reverseString(""), "");
+test("Palindrome", reverseString("racecar"), "racecar");`,
+      },
+      {
+        name: 'Valid Palindrome',
+        code: `// ===== CHALLENGE: Valid Palindrome =====
+// Check if a string is a palindrome, considering only
+// alphanumeric characters and ignoring case.
+//
+// Example: isPalindrome("A man, a plan, a canal: Panama") \u2192 true
+// Example: isPalindrome("race a car") \u2192 false
+//
+// Constraints:
+// - Ignore non-alphanumeric characters
+// - Case insensitive comparison
+
+function isPalindrome(s) {
+  // YOUR CODE HERE
+
+}
+
+// ===== TEST CASES =====
+const test = (name, actual, expected) => {
+  const pass = JSON.stringify(actual) === JSON.stringify(expected);
+  console.log(pass ? "\u2705" : "\u274C", name, pass ? "" : \`Expected \${JSON.stringify(expected)}, got \${JSON.stringify(actual)}\`);
+};
+
+test("Classic palindrome", isPalindrome("A man, a plan, a canal: Panama"), true);
+test("Not a palindrome", isPalindrome("race a car"), false);
+test("Empty string", isPalindrome(""), true);
+test("Single char", isPalindrome("a"), true);
+test("With numbers", isPalindrome("0P"), false);`,
+      },
+      {
+        name: 'FizzBuzz',
+        code: `// ===== CHALLENGE: FizzBuzz =====
+// Return an array of strings from 1 to n where:
+// - Multiples of 3 are replaced with "Fizz"
+// - Multiples of 5 are replaced with "Buzz"
+// - Multiples of both 3 and 5 are replaced with "FizzBuzz"
+// - Other numbers are converted to strings
+//
+// Example: fizzBuzz(5) \u2192 ["1", "2", "Fizz", "4", "Buzz"]
+//
+// Constraints:
+// - Return array of strings, not print them
+
+function fizzBuzz(n) {
+  // YOUR CODE HERE
+
+}
+
+// ===== TEST CASES =====
+const test = (name, actual, expected) => {
+  const pass = JSON.stringify(actual) === JSON.stringify(expected);
+  console.log(pass ? "\u2705" : "\u274C", name, pass ? "" : \`Expected \${JSON.stringify(expected)}, got \${JSON.stringify(actual)}\`);
+};
+
+test("First 5", fizzBuzz(5), ["1", "2", "Fizz", "4", "Buzz"]);
+test("First 15", fizzBuzz(15), ["1", "2", "Fizz", "4", "Buzz", "Fizz", "7", "8", "Fizz", "Buzz", "11", "Fizz", "13", "14", "FizzBuzz"]);
+test("Just 1", fizzBuzz(1), ["1"]);
+test("FizzBuzz at 30", fizzBuzz(30).slice(-1), ["FizzBuzz"]);`,
+      },
+      {
+        name: 'Max Profit',
+        code: `// ===== CHALLENGE: Max Profit (Best Time to Buy & Sell Stock) =====
+// Given an array of prices where prices[i] is the price on day i,
+// find the maximum profit from one transaction (buy then sell).
+// If no profit is possible, return 0.
+//
+// Example: maxProfit([7, 1, 5, 3, 6, 4]) \u2192 5  (buy at 1, sell at 6)
+// Example: maxProfit([7, 6, 4, 3, 1]) \u2192 0  (prices only decrease)
+//
+// Constraints:
+// - You must buy before you sell
+// - Only one transaction allowed
+
+function maxProfit(prices) {
+  // YOUR CODE HERE
+
+}
+
+// ===== TEST CASES =====
+const test = (name, actual, expected) => {
+  const pass = JSON.stringify(actual) === JSON.stringify(expected);
+  console.log(pass ? "\u2705" : "\u274C", name, pass ? "" : \`Expected \${JSON.stringify(expected)}, got \${JSON.stringify(actual)}\`);
+};
+
+test("Normal case", maxProfit([7, 1, 5, 3, 6, 4]), 5);
+test("Decreasing prices", maxProfit([7, 6, 4, 3, 1]), 0);
+test("Single day", maxProfit([5]), 0);
+test("Two days profit", maxProfit([1, 2]), 1);
+test("Buy first sell last", maxProfit([1, 4, 2, 7]), 6);`,
+      },
+      {
+        name: 'Valid Parentheses',
+        code: `// ===== CHALLENGE: Valid Parentheses =====
+// Given a string containing just '(', ')', '{', '}', '[' and ']',
+// determine if the input string is valid.
+//
+// A string is valid if:
+// - Open brackets are closed by the same type
+// - Open brackets are closed in the correct order
+//
+// Example: isValid("()[]{}") \u2192 true
+// Example: isValid("(]") \u2192 false
+//
+// Constraints:
+// - String contains only bracket characters
+
+function isValid(s) {
+  // YOUR CODE HERE
+
+}
+
+// ===== TEST CASES =====
+const test = (name, actual, expected) => {
+  const pass = JSON.stringify(actual) === JSON.stringify(expected);
+  console.log(pass ? "\u2705" : "\u274C", name, pass ? "" : \`Expected \${JSON.stringify(expected)}, got \${JSON.stringify(actual)}\`);
+};
+
+test("Simple pair", isValid("()"), true);
+test("Multiple types", isValid("()[]{}"), true);
+test("Mismatched", isValid("(]"), false);
+test("Nested valid", isValid("{[()]}"), true);
+test("Wrong order", isValid("([)]"), false);
+test("Empty string", isValid(""), true);`,
+      },
+      {
+        name: 'Merge Sorted Arrays',
+        code: `// ===== CHALLENGE: Merge Sorted Arrays =====
+// Given two sorted arrays, merge them into one sorted array.
+//
+// Example: mergeSorted([1, 3, 5], [2, 4, 6]) \u2192 [1, 2, 3, 4, 5, 6]
+//
+// Constraints:
+// - Both input arrays are already sorted in ascending order
+// - Do not simply concatenate and sort
+// - Aim for O(n + m) time complexity
+
+function mergeSorted(arr1, arr2) {
+  // YOUR CODE HERE
+
+}
+
+// ===== TEST CASES =====
+const test = (name, actual, expected) => {
+  const pass = JSON.stringify(actual) === JSON.stringify(expected);
+  console.log(pass ? "\u2705" : "\u274C", name, pass ? "" : \`Expected \${JSON.stringify(expected)}, got \${JSON.stringify(actual)}\`);
+};
+
+test("Equal length", mergeSorted([1, 3, 5], [2, 4, 6]), [1, 2, 3, 4, 5, 6]);
+test("Different lengths", mergeSorted([1, 2], [3, 4, 5, 6]), [1, 2, 3, 4, 5, 6]);
+test("One empty", mergeSorted([], [1, 2, 3]), [1, 2, 3]);
+test("Both empty", mergeSorted([], []), []);
+test("With duplicates", mergeSorted([1, 3, 3], [2, 3, 4]), [1, 2, 3, 3, 3, 4]);`,
+      },
+      {
+        name: 'Flatten Array',
+        code: `// ===== CHALLENGE: Flatten Array =====
+// Flatten a deeply nested array without using Array.prototype.flat().
+//
+// Example: flatten([1, [2, [3, [4]], 5]]) \u2192 [1, 2, 3, 4, 5]
+//
+// Constraints:
+// - Do not use .flat() or .flatMap()
+// - Handle arbitrary nesting depth
+// - Return a new array (don't modify the original)
+
+function flatten(arr) {
+  // YOUR CODE HERE
+
+}
+
+// ===== TEST CASES =====
+const test = (name, actual, expected) => {
+  const pass = JSON.stringify(actual) === JSON.stringify(expected);
+  console.log(pass ? "\u2705" : "\u274C", name, pass ? "" : \`Expected \${JSON.stringify(expected)}, got \${JSON.stringify(actual)}\`);
+};
+
+test("Nested", flatten([1, [2, [3, [4]], 5]]), [1, 2, 3, 4, 5]);
+test("Already flat", flatten([1, 2, 3]), [1, 2, 3]);
+test("Deep nesting", flatten([[[[1]]]]), [1]);
+test("Mixed", flatten([1, [2, 3], [4, [5, 6]]]), [1, 2, 3, 4, 5, 6]);
+test("Empty arrays", flatten([[], [1], [], [2, []], 3]), [1, 2, 3]);`,
+      },
+      {
+        name: 'Debounce',
+        code: `// ===== CHALLENGE: Debounce =====
+// Implement a debounce function that delays invoking the provided
+// function until after 'delay' milliseconds have elapsed since
+// the last time it was invoked.
+//
+// Example:
+//   const debouncedFn = debounce(fn, 300);
+//   debouncedFn(); // starts timer
+//   debouncedFn(); // resets timer
+//   // fn is called once, 300ms after the last call
+//
+// Constraints:
+// - Returns a new function
+// - Resets the timer on each call
+// - Passes arguments to the original function
+
+function debounce(fn, delay) {
+  // YOUR CODE HERE
+
+}
+
+// ===== TEST CASES =====
+let callCount = 0;
+let lastArgs = null;
+const trackedFn = (...args) => { callCount++; lastArgs = args; };
+
+const test = (name, actual, expected) => {
+  const pass = JSON.stringify(actual) === JSON.stringify(expected);
+  console.log(pass ? "\u2705" : "\u274C", name, pass ? "" : \`Expected \${JSON.stringify(expected)}, got \${JSON.stringify(actual)}\`);
+};
+
+// Test: multiple rapid calls only trigger once
+callCount = 0;
+const debounced = debounce(trackedFn, 100);
+debounced("a");
+debounced("b");
+debounced("c");
+
+test("Not called immediately", callCount, 0);
+
+setTimeout(() => {
+  test("Called once after delay", callCount, 1);
+  test("Called with last args", lastArgs, ["c"]);
+}, 150);
+
+// Test: separate calls with enough gap
+let count2 = 0;
+const debounced2 = debounce(() => count2++, 50);
+debounced2();
+setTimeout(() => {
+  debounced2();
+  setTimeout(() => {
+    test("Two separate calls", count2, 2);
+  }, 80);
+}, 80);`,
+      },
+      {
+        name: 'Group Anagrams',
+        code: `// ===== CHALLENGE: Group Anagrams =====
+// Given an array of strings, group the anagrams together.
+// An anagram is a word formed by rearranging the letters of another.
+//
+// Example: groupAnagrams(["eat","tea","tan","ate","nat","bat"])
+//   \u2192 [["eat","tea","ate"], ["tan","nat"], ["bat"]]
+//
+// Constraints:
+// - Order of groups doesn't matter
+// - Order within groups doesn't matter
+// - All inputs are lowercase letters
+
+function groupAnagrams(strs) {
+  // YOUR CODE HERE
+
+}
+
+// ===== TEST CASES =====
+const test = (name, actual, expected) => {
+  // Sort inner arrays and outer array for comparison
+  const normalize = (arr) =>
+    arr.map(g => [...g].sort()).sort((a, b) => a.join(",").localeCompare(b.join(",")));
+  const pass = JSON.stringify(normalize(actual)) === JSON.stringify(normalize(expected));
+  console.log(pass ? "\u2705" : "\u274C", name, pass ? "" : \`Expected \${JSON.stringify(expected)}, got \${JSON.stringify(actual)}\`);
+};
+
+test("Mixed anagrams", groupAnagrams(["eat","tea","tan","ate","nat","bat"]), [["eat","tea","ate"],["tan","nat"],["bat"]]);
+test("Single string", groupAnagrams(["a"]), [["a"]]);
+test("Empty string", groupAnagrams([""]), [[""]]);
+test("No anagrams", groupAnagrams(["abc","def","ghi"]), [["abc"],["def"],["ghi"]]);`,
+      },
+    ],
+  },
 ];
 
 // Flatten for easy access
-const allTemplates = templateCategories.flatMap(cat =>
+const allTemplates: FlatTemplate[] = templateCategories.flatMap(cat =>
   cat.templates.map(t => ({ ...t, category: cat.label, tag: cat.tag }))
 );
 
 // ==================== Helpers ====================
 
-function formatValue(val) {
+function formatValue(val: any): string {
   if (val === null) return 'null';
   if (val === undefined) return 'undefined';
   if (typeof val === 'string') return val;
@@ -1052,12 +1412,12 @@ function formatValue(val) {
   }
 }
 
-function detectJSX(code) {
+function detectJSX(code: string): boolean {
   return /render\s*\(/.test(code) || /<[A-Z]/.test(code);
 }
 
-let babelModule = null;
-async function transpileJSX(code) {
+let babelModule: any = null;
+async function transpileJSX(code: string): Promise<string> {
   if (!babelModule) {
     babelModule = await import('@babel/standalone');
   }
@@ -1071,30 +1431,30 @@ async function transpileJSX(code) {
 // ==================== Component ====================
 
 export default function CodePlayground() {
-  const initialCode = sessionStorage.getItem('playground-code') || allTemplates[0].code;
+  const initialCode: string = sessionStorage.getItem('playground-code') || allTemplates[0].code;
 
-  const [code, setCode] = useState(initialCode);
-  const [output, setOutput] = useState([]);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isRunning, setIsRunning] = useState(false);
-  const [hasPreview, setHasPreview] = useState(false);
-  const [selectedName, setSelectedName] = useState(sessionStorage.getItem('playground-code') ? null : 'Hello World');
-  const [drawerSearch, setDrawerSearch] = useState('');
-  const [drawerFilter, setDrawerFilter] = useState('all');
-  const textareaRef = useRef(null);
-  const previewRef = useRef(null);
-  const reactRootRef = useRef(null);
-  const drawerSearchRef = useRef(null);
-  const isJSX = detectJSX(code);
+  const [code, setCode] = useState<string>(initialCode);
+  const [output, setOutput] = useState<OutputEntry[]>([]);
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const [isRunning, setIsRunning] = useState<boolean>(false);
+  const [hasPreview, setHasPreview] = useState<boolean>(false);
+  const [selectedName, setSelectedName] = useState<string | null>(sessionStorage.getItem('playground-code') ? null : 'Hello World');
+  const [drawerSearch, setDrawerSearch] = useState<string>('');
+  const [drawerFilter, setDrawerFilter] = useState<string>('all');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
+  const reactRootRef = useRef<any>(null);
+  const drawerSearchRef = useRef<HTMLInputElement>(null);
+  const isJSX: boolean = detectJSX(code);
 
   // Unique tags for filter pills
-  const tagOptions = useMemo(() => {
+  const tagOptions: string[] = useMemo(() => {
     const tags = [...new Set(templateCategories.map(c => c.tag))];
     return ['all', ...tags.map(t => t.toLowerCase())];
   }, []);
 
   // Filtered templates
-  const filteredCategories = useMemo(() => {
+  const filteredCategories: TemplateCategory[] = useMemo(() => {
     return templateCategories
       .filter(cat => drawerFilter === 'all' || cat.tag.toLowerCase() === drawerFilter)
       .map(cat => ({
@@ -1123,14 +1483,14 @@ export default function CodePlayground() {
 
   const runCode = useCallback(async () => {
     setIsRunning(true);
-    const logs = [];
+    const logs: OutputEntry[] = [];
     const origLog = console.log;
     const origWarn = console.warn;
     const origError = console.error;
 
-    console.log = (...args) => logs.push({ type: 'log', text: args.map(formatValue).join(' ') });
-    console.warn = (...args) => logs.push({ type: 'warn', text: args.map(formatValue).join(' ') });
-    console.error = (...args) => logs.push({ type: 'error', text: args.map(formatValue).join(' ') });
+    console.log = (...args: any[]) => logs.push({ type: 'log', text: args.map(formatValue).join(' ') });
+    console.warn = (...args: any[]) => logs.push({ type: 'warn', text: args.map(formatValue).join(' ') });
+    console.error = (...args: any[]) => logs.push({ type: 'error', text: args.map(formatValue).join(' ') });
 
     // Unmount previous React render
     if (reactRootRef.current) {
@@ -1140,8 +1500,8 @@ export default function CodePlayground() {
     setHasPreview(false);
 
     try {
-      let execCode = code;
-      const needsJSX = detectJSX(code);
+      let execCode: string = code;
+      const needsJSX: boolean = detectJSX(code);
 
       if (needsJSX) {
         execCode = await transpileJSX(code);
@@ -1149,7 +1509,7 @@ export default function CodePlayground() {
 
       if (needsJSX) {
         // Inject React scope and render function
-        const renderFn = (element) => {
+        const renderFn = (element: React.ReactElement) => {
           if (previewRef.current) {
             if (reactRootRef.current) {
               try { reactRootRef.current.unmount(); } catch { /* ignore */ }
@@ -1160,7 +1520,7 @@ export default function CodePlayground() {
           }
         };
 
-        const scope = {
+        const scope: Record<string, any> = {
           React,
           useState: React.useState,
           useEffect: React.useEffect,
@@ -1175,8 +1535,8 @@ export default function CodePlayground() {
           render: renderFn,
         };
 
-        const scopeKeys = Object.keys(scope);
-        const scopeValues = Object.values(scope);
+        const scopeKeys: string[] = Object.keys(scope);
+        const scopeValues: any[] = Object.values(scope);
         const fn = new Function(...scopeKeys, execCode);
         fn(...scopeValues);
       } else {
@@ -1186,7 +1546,7 @@ export default function CodePlayground() {
           logs.push({ type: 'result', text: `\u2192 ${formatValue(result)}` });
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       logs.push({ type: 'error', text: `${err.name}: ${err.message}` });
     } finally {
       console.log = origLog;
@@ -1195,7 +1555,7 @@ export default function CodePlayground() {
       setIsRunning(false);
     }
 
-    const syncLogs = [...logs];
+    const syncLogs: OutputEntry[] = [...logs];
     setOutput(syncLogs);
 
     // Collect async logs
@@ -1208,7 +1568,7 @@ export default function CodePlayground() {
 
   // Cmd+Enter to run, Escape to close drawer
   useEffect(() => {
-    const handler = (e) => {
+    const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
         e.preventDefault();
         runCode();
@@ -1221,7 +1581,7 @@ export default function CodePlayground() {
     return () => window.removeEventListener('keydown', handler);
   }, [runCode, isDrawerOpen]);
 
-  const handleTemplate = (template) => {
+  const handleTemplate = (template: Template): void => {
     if (reactRootRef.current) {
       try { reactRootRef.current.unmount(); } catch { /* ignore */ }
       reactRootRef.current = null;
@@ -1234,7 +1594,7 @@ export default function CodePlayground() {
     setDrawerSearch('');
   };
 
-  const handleClear = () => {
+  const handleClear = (): void => {
     if (reactRootRef.current) {
       try { reactRootRef.current.unmount(); } catch { /* ignore */ }
       reactRootRef.current = null;
@@ -1243,7 +1603,7 @@ export default function CodePlayground() {
     setHasPreview(false);
   };
 
-  const openDrawer = () => {
+  const openDrawer = (): void => {
     setIsDrawerOpen(true);
     setDrawerSearch('');
     setDrawerFilter('all');
@@ -1251,14 +1611,15 @@ export default function CodePlayground() {
   };
 
   // Handle tab key in textarea
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>): void => {
     if (e.key === 'Tab') {
       e.preventDefault();
-      const start = e.target.selectionStart;
-      const end = e.target.selectionEnd;
+      const target = e.target as HTMLTextAreaElement;
+      const start: number = target.selectionStart;
+      const end: number = target.selectionEnd;
       setCode(code.substring(0, start) + '  ' + code.substring(end));
       setTimeout(() => {
-        e.target.selectionStart = e.target.selectionEnd = start + 2;
+        target.selectionStart = target.selectionEnd = start + 2;
       }, 0);
     }
   };
@@ -1309,8 +1670,8 @@ export default function CodePlayground() {
                   <input
                     ref={drawerSearchRef}
                     value={drawerSearch}
-                    onChange={(e) => setDrawerSearch(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Escape' && setIsDrawerOpen(false)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDrawerSearch(e.target.value)}
+                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Escape' && setIsDrawerOpen(false)}
                     placeholder="Search templates..."
                     className="flex-1 bg-transparent outline-none text-sm placeholder:text-slate-400"
                   />
@@ -1323,8 +1684,8 @@ export default function CodePlayground() {
 
                 {/* Category Filter Pills */}
                 <div className="mt-3 flex gap-1.5 overflow-x-auto">
-                  {tagOptions.map(tag => {
-                    const count = tag === 'all' ? allTemplates.length : allTemplates.filter(t => t.tag.toLowerCase() === tag).length;
+                  {tagOptions.map((tag: string) => {
+                    const count: number = tag === 'all' ? allTemplates.length : allTemplates.filter(t => t.tag.toLowerCase() === tag).length;
                     return (
                       <button
                         key={tag}
@@ -1363,7 +1724,7 @@ export default function CodePlayground() {
                     <p className="text-xs mt-1">Try a different search or filter</p>
                   </div>
                 ) : (
-                  filteredCategories.map(cat => (
+                  filteredCategories.map((cat: TemplateCategory) => (
                     <div key={cat.label} className="mb-3">
                       <div className="px-2 py-2 flex items-center gap-2 sticky top-0 bg-white/95 dark:bg-[#0f0f1a]/95 backdrop-blur-sm z-10">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
@@ -1380,8 +1741,8 @@ export default function CodePlayground() {
                         <span className="text-[10px] text-slate-300 dark:text-slate-600">{cat.templates.length}</span>
                       </div>
                       <div className="space-y-0.5">
-                        {cat.templates.map(t => {
-                          const isActive = selectedName === t.name;
+                        {cat.templates.map((t: Template) => {
+                          const isActive: boolean = selectedName === t.name;
                           return (
                             <button
                               key={t.name}
@@ -1423,7 +1784,7 @@ export default function CodePlayground() {
         )}
       </AnimatePresence>
 
-      {/* Header — always dark like an IDE */}
+      {/* Header -- always dark like an IDE */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[#2d333b] bg-[#1c2028] shrink-0 text-slate-200">
         <div className="flex items-center gap-3 min-w-0">
           <Link to="/" className="text-slate-400 hover:text-white transition-colors shrink-0">
@@ -1432,7 +1793,7 @@ export default function CodePlayground() {
           <h1 className="text-lg font-bold shrink-0 text-white">Playground</h1>
           {selectedName && (
             <span className="text-sm text-slate-500 font-normal truncate hidden sm:inline">
-              — {selectedName}
+              \u2014 {selectedName}
             </span>
           )}
           {isJSX && (
@@ -1464,12 +1825,12 @@ export default function CodePlayground() {
           >
             {isRunning ? <Loader2 size={14} className="animate-spin" /> : <Play size={14} />}
             {isRunning ? 'Running...' : 'Run'}
-            <kbd className="hidden sm:inline text-[10px] opacity-70 ml-1">⌘↵</kbd>
+            <kbd className="hidden sm:inline text-[10px] opacity-70 ml-1">\u2318\u21B5</kbd>
           </button>
         </div>
       </div>
 
-      {/* Editor + Output — always dark */}
+      {/* Editor + Output -- always dark */}
       <div className="flex-1 flex flex-col md:flex-row min-h-0">
         {/* Editor Panel */}
         <div className="flex-1 flex flex-col min-h-0 border-b md:border-b-0 md:border-r border-[#2d333b]">
@@ -1482,7 +1843,7 @@ export default function CodePlayground() {
           <textarea
             ref={textareaRef}
             value={code}
-            onChange={(e) => setCode(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCode(e.target.value)}
             onKeyDown={handleKeyDown}
             className="flex-1 p-4 font-mono text-sm leading-relaxed bg-[#1e1e2e] text-[#cdd6f4] resize-none outline-none min-h-[200px]"
             spellCheck={false}
@@ -1502,10 +1863,10 @@ export default function CodePlayground() {
           <div className={`overflow-auto p-4 bg-[#1e1e2e] font-mono text-sm ${hasPreview ? 'max-h-[30vh]' : 'flex-1 min-h-[100px]'}`}>
             {output.length === 0 && !hasPreview ? (
               <div className="text-slate-500 italic">
-                Click "Run" or press ⌘+Enter to execute your code...
+                Click "Run" or press \u2318+Enter to execute your code...
               </div>
             ) : (
-              output.map((entry, i) => (
+              output.map((entry: OutputEntry, i: number) => (
                 <div
                   key={i}
                   className={`py-1 border-b border-slate-800/50 last:border-0 ${
@@ -1522,7 +1883,7 @@ export default function CodePlayground() {
             )}
           </div>
 
-          {/* React Preview — always mounted, toggled via CSS */}
+          {/* React Preview -- always mounted, toggled via CSS */}
           <div className={hasPreview ? 'flex-1 flex flex-col min-h-0' : 'h-0 overflow-hidden'}>
             <div className="px-4 py-2 text-xs font-medium text-slate-500 border-y border-[#2d333b] bg-[#22272e] shrink-0 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-blue-500" />

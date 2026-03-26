@@ -5,10 +5,30 @@ import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Timer, Play, SkipForward, ThumbsUp, ThumbsDown, RotateCcw, Trophy } from 'lucide-react';
-import { menuStructure, getAllQuestions, extractQuestions, contentFiles } from '../data';
+import { menuStructure, getAllQuestions, extractQuestions, contentFiles, type Question, type MenuSection } from '../data';
 import { useStudyStats } from '../hooks/useStudyStats';
 
-function shuffleArray(arr) {
+interface InterviewConfig {
+  questionCount: number;
+  timeLimit: number;
+  categories: string[];
+}
+
+interface InterviewResult {
+  questionId: string;
+  guide: string;
+  correct: boolean;
+  skipped: boolean;
+}
+
+interface CategoryBreakdown {
+  total: number;
+  correct: number;
+}
+
+type Phase = 'setup' | 'interview' | 'results';
+
+function shuffleArray<T>(arr: T[]): T[] {
   const s = [...arr];
   for (let i = s.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -17,45 +37,45 @@ function shuffleArray(arr) {
   return s;
 }
 
-function formatTime(seconds) {
+function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-const categories = menuStructure.filter(s => s.items).map(s => s.name);
+const categories: string[] = menuStructure.filter((s: MenuSection) => s.items).map((s: MenuSection) => s.name);
 
 export default function InterviewSimulator() {
-  const [phase, setPhase] = useState('setup'); // setup | interview | results
-  const [config, setConfig] = useState({ questionCount: 20, timeLimit: 30, categories: [...categories] });
-  const [questions, setQuestions] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isRevealed, setIsRevealed] = useState(false);
-  const [results, setResults] = useState([]);
-  const [timeLeft, setTimeLeft] = useState(0);
-  const startTimeRef = useRef(null);
-  const timerRef = useRef(null);
+  const [phase, setPhase] = useState<Phase>('setup');
+  const [config, setConfig] = useState<InterviewConfig>({ questionCount: 20, timeLimit: 30, categories: [...categories] });
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [isRevealed, setIsRevealed] = useState<boolean>(false);
+  const [results, setResults] = useState<InterviewResult[]>([]);
+  const [timeLeft, setTimeLeft] = useState<number>(0);
+  const startTimeRef = useRef<number | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { recordQuestionReviewed } = useStudyStats();
 
   // Timer
   useEffect(() => {
     if (phase !== 'interview') return;
     timerRef.current = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
+      const elapsed = Math.floor((Date.now() - (startTimeRef.current as number)) / 1000);
       const remaining = config.timeLimit * 60 - elapsed;
       if (remaining <= 0) {
-        clearInterval(timerRef.current);
+        clearInterval(timerRef.current as ReturnType<typeof setInterval>);
         setPhase('results');
       }
       setTimeLeft(Math.max(0, remaining));
     }, 1000);
-    return () => clearInterval(timerRef.current);
+    return () => clearInterval(timerRef.current as ReturnType<typeof setInterval>);
   }, [phase, config.timeLimit]);
 
-  const startInterview = () => {
-    const allQ = getAllQuestions().filter(q => {
-      const section = menuStructure.find(s => s.items?.some(i => i.name === q.guide));
-      return section && config.categories.includes(section.name);
+  const startInterview = (): void => {
+    const allQ: Question[] = getAllQuestions().filter((q: Question) => {
+      const section = menuStructure.find((s: any) => s.items?.some((i: any) => i.name === q.guide));
+      return section && config.categories.includes((section as any).name);
     });
     const shuffled = shuffleArray(allQ).slice(0, config.questionCount);
     setQuestions(shuffled);
@@ -67,32 +87,32 @@ export default function InterviewSimulator() {
     setPhase('interview');
   };
 
-  const handleAnswer = (correct) => {
+  const handleAnswer = (correct: boolean): void => {
     recordQuestionReviewed();
-    setResults(prev => [...prev, { questionId: questions[currentIndex].id, guide: questions[currentIndex].guide, correct, skipped: false }]);
+    setResults((prev: InterviewResult[]) => [...prev, { questionId: questions[currentIndex].id, guide: questions[currentIndex].guide, correct, skipped: false }]);
     advance();
   };
 
-  const handleSkip = () => {
-    setResults(prev => [...prev, { questionId: questions[currentIndex].id, guide: questions[currentIndex].guide, correct: false, skipped: true }]);
+  const handleSkip = (): void => {
+    setResults((prev: InterviewResult[]) => [...prev, { questionId: questions[currentIndex].id, guide: questions[currentIndex].guide, correct: false, skipped: true }]);
     advance();
   };
 
-  const advance = () => {
+  const advance = (): void => {
     if (currentIndex >= questions.length - 1) {
-      clearInterval(timerRef.current);
+      clearInterval(timerRef.current as ReturnType<typeof setInterval>);
       setPhase('results');
     } else {
-      setCurrentIndex(i => i + 1);
+      setCurrentIndex((i: number) => i + 1);
       setIsRevealed(false);
     }
   };
 
-  const toggleCategory = (cat) => {
-    setConfig(prev => ({
+  const toggleCategory = (cat: string): void => {
+    setConfig((prev: InterviewConfig) => ({
       ...prev,
       categories: prev.categories.includes(cat)
-        ? prev.categories.filter(c => c !== cat)
+        ? prev.categories.filter((c: string) => c !== cat)
         : [...prev.categories, cat]
     }));
   };
@@ -112,10 +132,10 @@ export default function InterviewSimulator() {
           <div>
             <label className="text-sm font-semibold mb-3 block">Number of Questions</label>
             <div className="flex gap-2">
-              {[10, 20, 30].map(n => (
+              {[10, 20, 30].map((n: number) => (
                 <button
                   key={n}
-                  onClick={() => setConfig(p => ({ ...p, questionCount: n }))}
+                  onClick={() => setConfig((p: InterviewConfig) => ({ ...p, questionCount: n }))}
                   className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-colors ${config.questionCount === n ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                 >
                   {n}
@@ -128,10 +148,10 @@ export default function InterviewSimulator() {
           <div>
             <label className="text-sm font-semibold mb-3 block">Time Limit</label>
             <div className="flex gap-2">
-              {[15, 30, 45].map(n => (
+              {[15, 30, 45].map((n: number) => (
                 <button
                   key={n}
-                  onClick={() => setConfig(p => ({ ...p, timeLimit: n }))}
+                  onClick={() => setConfig((p: InterviewConfig) => ({ ...p, timeLimit: n }))}
                   className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-colors ${config.timeLimit === n ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                 >
                   {n} min
@@ -144,7 +164,7 @@ export default function InterviewSimulator() {
           <div>
             <label className="text-sm font-semibold mb-3 block">Categories</label>
             <div className="flex flex-wrap gap-2">
-              {categories.map(cat => (
+              {categories.map((cat: string) => (
                 <button
                   key={cat}
                   onClick={() => toggleCategory(cat)}
@@ -170,8 +190,8 @@ export default function InterviewSimulator() {
 
   // Interview Phase
   if (phase === 'interview') {
-    const current = questions[currentIndex];
-    const isLowTime = timeLeft < 120;
+    const current: Question = questions[currentIndex];
+    const isLowTime: boolean = timeLeft < 120;
 
     return (
       <div className="max-w-3xl mx-auto px-6 py-8">
@@ -245,17 +265,17 @@ export default function InterviewSimulator() {
   }
 
   // Results Phase
-  const correct = results.filter(r => r.correct).length;
-  const skipped = results.filter(r => r.skipped).length;
-  const answered = results.length - skipped;
-  const timeTaken = config.timeLimit * 60 - timeLeft;
-  const score = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+  const correct: number = results.filter((r: InterviewResult) => r.correct).length;
+  const skipped: number = results.filter((r: InterviewResult) => r.skipped).length;
+  const answered: number = results.length - skipped;
+  const timeTaken: number = config.timeLimit * 60 - timeLeft;
+  const score: number = answered > 0 ? Math.round((correct / answered) * 100) : 0;
 
   // Category breakdown
-  const breakdown = {};
+  const breakdown: Record<string, CategoryBreakdown> = {};
   for (const r of results) {
-    const section = menuStructure.find(s => s.items?.some(i => i.name === r.guide));
-    const cat = section?.name || 'Other';
+    const section = menuStructure.find((s: any) => s.items?.some((i: any) => i.name === r.guide));
+    const cat: string = (section as any)?.name || 'Other';
     if (!breakdown[cat]) breakdown[cat] = { total: 0, correct: 0 };
     breakdown[cat].total++;
     if (r.correct) breakdown[cat].correct++;
@@ -291,9 +311,9 @@ export default function InterviewSimulator() {
           <div className="mb-8">
             <h3 className="text-sm font-bold mb-3">Category Breakdown</h3>
             <div className="space-y-2">
-              {Object.entries(breakdown).map(([cat, data]) => {
-                const pct = Math.round((data.correct / data.total) * 100);
-                const isWeak = pct < 50;
+              {Object.entries(breakdown).map(([cat, data]: [string, CategoryBreakdown]) => {
+                const pct: number = Math.round((data.correct / data.total) * 100);
+                const isWeak: boolean = pct < 50;
                 return (
                   <div key={cat} className="flex items-center gap-3">
                     <span className="text-sm w-32 truncate">{cat}</span>

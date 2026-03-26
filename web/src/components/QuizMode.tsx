@@ -8,12 +8,22 @@ import {
   ChevronLeft, ChevronRight, RotateCcw, Shuffle,
   ThumbsUp, ThumbsDown, ArrowLeft, BookOpen, Bookmark, BookmarkCheck
 } from 'lucide-react';
-import { menuStructure, getAllQuestions, extractQuestions, contentFiles } from '../data';
+import { menuStructure, getAllQuestions, extractQuestions, contentFiles, type Question } from '../data';
 import { useSpacedRepetition } from '../hooks/useSpacedRepetition';
 import { useStudyStats } from '../hooks/useStudyStats';
 import { useBookmarks } from '../hooks/useBookmarks';
 
-function shuffleArray(arr) {
+interface GuideOption {
+  value: string;
+  label: string;
+}
+
+interface Score {
+  knew: number;
+  learning: number;
+}
+
+function shuffleArray<T>(arr: T[]): T[] {
   const shuffled = [...arr];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -23,25 +33,25 @@ function shuffleArray(arr) {
 }
 
 export default function QuizMode() {
-  const [selectedGuide, setSelectedGuide] = useState('all');
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [score, setScore] = useState({ knew: 0, learning: 0 });
-  const [isShuffled, setIsShuffled] = useState(false);
-  const [difficulty, setDifficulty] = useState('all');
-  const [reviewed, setReviewed] = useState(new Set());
+  const [selectedGuide, setSelectedGuide] = useState<string>('all');
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [isFlipped, setIsFlipped] = useState<boolean>(false);
+  const [score, setScore] = useState<Score>({ knew: 0, learning: 0 });
+  const [isShuffled, setIsShuffled] = useState<boolean>(false);
+  const [difficulty, setDifficulty] = useState<string>('all');
+  const [reviewed, setReviewed] = useState<Set<string>>(new Set());
   const { recordReview } = useSpacedRepetition();
   const { recordQuestionReviewed } = useStudyStats();
   const { isBookmarked, toggleBookmark } = useBookmarks();
 
   // Build guide options
-  const guideOptions = useMemo(() => {
-    const options = [{ value: 'all', label: 'All Guides' }];
+  const guideOptions: GuideOption[] = useMemo(() => {
+    const options: GuideOption[] = [{ value: 'all', label: 'All Guides' }];
     for (const section of menuStructure) {
-      if (!section.items) continue;
-      for (const item of section.items) {
-        const content = contentFiles[item.file] || '';
-        const qs = extractQuestions(content, item.name);
+      if (!(section as any).items) continue;
+      for (const item of (section as any).items) {
+        const content: string = (contentFiles as Record<string, string>)[item.file] || '';
+        const qs: Question[] = extractQuestions(content, item.name);
         if (qs.length > 0) {
           options.push({ value: item.name, label: `${item.name} (${qs.length})` });
         }
@@ -51,46 +61,46 @@ export default function QuizMode() {
   }, []);
 
   // Get filtered questions
-  const questions = useMemo(() => {
-    let qs;
+  const questions: Question[] = useMemo(() => {
+    let qs: Question[];
     if (selectedGuide === 'all') {
       qs = getAllQuestions();
     } else {
-      const item = menuStructure.flatMap(s => s.items || []).find(i => i.name === selectedGuide);
+      const item = menuStructure.flatMap((s: any) => s.items || []).find((i: any) => i.name === selectedGuide);
       if (item) {
-        qs = extractQuestions(contentFiles[item.file] || '', item.name);
+        qs = extractQuestions((contentFiles as Record<string, string>)[(item as any).file] || '', (item as any).name);
       } else {
         qs = [];
       }
     }
     if (difficulty !== 'all') {
-      qs = qs.filter(q => q.difficulty === difficulty);
+      qs = qs.filter((q: Question) => q.difficulty === difficulty);
     }
     return isShuffled ? shuffleArray(qs) : qs;
   }, [selectedGuide, isShuffled, difficulty]);
 
-  const currentQuestion = questions[currentIndex];
-  const total = questions.length;
-  const progress = total > 0 ? ((reviewed.size / total) * 100) : 0;
+  const currentQuestion: Question | undefined = questions[currentIndex];
+  const total: number = questions.length;
+  const progress: number = total > 0 ? ((reviewed.size / total) * 100) : 0;
 
   const handleNext = useCallback(() => {
     if (currentIndex < total - 1) {
-      setCurrentIndex(i => i + 1);
+      setCurrentIndex((i: number) => i + 1);
       setIsFlipped(false);
     }
   }, [currentIndex, total]);
 
   const handlePrev = useCallback(() => {
     if (currentIndex > 0) {
-      setCurrentIndex(i => i - 1);
+      setCurrentIndex((i: number) => i - 1);
       setIsFlipped(false);
     }
   }, [currentIndex]);
 
-  const handleScore = useCallback((knew) => {
+  const handleScore = useCallback((knew: boolean) => {
     if (currentQuestion) {
-      setReviewed(prev => new Set(prev).add(currentQuestion.id));
-      setScore(prev => ({
+      setReviewed((prev: Set<string>) => new Set(prev).add(currentQuestion.id));
+      setScore((prev: Score) => ({
         knew: prev.knew + (knew ? 1 : 0),
         learning: prev.learning + (knew ? 0 : 1),
       }));
@@ -100,14 +110,14 @@ export default function QuizMode() {
     handleNext();
   }, [currentQuestion, handleNext, recordReview, recordQuestionReviewed]);
 
-  const handleReset = () => {
+  const handleReset = (): void => {
     setCurrentIndex(0);
     setIsFlipped(false);
     setScore({ knew: 0, learning: 0 });
     setReviewed(new Set());
   };
 
-  const handleGuideChange = (value) => {
+  const handleGuideChange = (value: string): void => {
     setSelectedGuide(value);
     setDifficulty('all');
     setCurrentIndex(0);
@@ -159,15 +169,15 @@ export default function QuizMode() {
         <div className="flex items-center gap-2">
           <select
             value={selectedGuide}
-            onChange={(e) => handleGuideChange(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleGuideChange(e.target.value)}
             className="text-sm px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 outline-none focus:ring-2 focus:ring-indigo-500/30 transition-shadow"
           >
-            {guideOptions.map(opt => (
+            {guideOptions.map((opt: GuideOption) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
           <button
-            onClick={() => { setIsShuffled(s => !s); setCurrentIndex(0); setIsFlipped(false); }}
+            onClick={() => { setIsShuffled((s: boolean) => !s); setCurrentIndex(0); setIsFlipped(false); }}
             className={`p-2 rounded-xl border transition-colors ${isShuffled ? 'bg-indigo-50 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400' : 'border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
             title="Shuffle questions"
           >
@@ -187,7 +197,7 @@ export default function QuizMode() {
       <div className="flex items-center gap-2 mb-6">
         <span className="text-xs text-slate-500 mr-1">Difficulty:</span>
         <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-0.5">
-          {['all', 'beginner', 'intermediate', 'advanced'].map(level => (
+          {['all', 'beginner', 'intermediate', 'advanced'].map((level: string) => (
             <button
               key={level}
               onClick={() => { setDifficulty(level); setCurrentIndex(0); setIsFlipped(false); setScore({ knew: 0, learning: 0 }); setReviewed(new Set()); }}
@@ -225,7 +235,7 @@ export default function QuizMode() {
       {currentQuestion && (
         <div className="mb-8">
           <div
-            onClick={() => setIsFlipped(f => !f)}
+            onClick={() => setIsFlipped((f: boolean) => !f)}
             className="cursor-pointer select-none"
             style={{ perspective: '1200px' }}
           >
@@ -243,7 +253,7 @@ export default function QuizMode() {
                   <div className="min-h-[280px] p-8 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm flex flex-col relative">
                     {/* Bookmark button */}
                     <button
-                      onClick={(e) => {
+                      onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                         e.stopPropagation();
                         toggleBookmark({ id: `quiz__${currentQuestion.id}`, questionId: currentQuestion.id, questionText: currentQuestion.question.slice(0, 100), guideName: currentQuestion.guide, type: 'quiz' });
                       }}

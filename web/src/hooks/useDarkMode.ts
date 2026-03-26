@@ -1,8 +1,15 @@
 import { useState, useEffect } from 'react';
 
-export function useDarkMode() {
-  const [theme, setTheme] = useState(
-    localStorage.getItem('theme') || 
+export type Theme = 'light' | 'dark';
+
+export interface UseDarkModeReturn {
+  theme: Theme;
+  toggleTheme: () => void;
+}
+
+export function useDarkMode(): UseDarkModeReturn {
+  const [theme, setTheme] = useState<Theme>(
+    (localStorage.getItem('theme') as Theme | null) ||
     (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
   );
 
@@ -16,7 +23,7 @@ export function useDarkMode() {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  const toggleTheme = () => {
+  const toggleTheme = (): void => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
 

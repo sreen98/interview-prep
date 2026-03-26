@@ -2,17 +2,30 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Flame, X } from 'lucide-react';
 
-const messages = {
-  3: { emoji: '🔥', text: "3-day streak! You're getting started!" },
-  7: { emoji: '🔥', text: "7-day streak! A whole week of learning!" },
-  14: { emoji: '⚡', text: "14-day streak! Consistency is key!" },
-  30: { emoji: '🏆', text: "30-day streak! A full month — amazing!" },
-  60: { emoji: '💎', text: "60-day streak! You're unstoppable!" },
-  100: { emoji: '👑', text: "100-day streak! Legendary dedication!" },
-  365: { emoji: '🌟', text: "365-day streak! A full year! Incredible!" },
+interface StreakMessage {
+  emoji: string;
+  text: string;
+}
+
+const messages: Record<number, StreakMessage> = {
+  3: { emoji: '\u{1F525}', text: "3-day streak! You're getting started!" },
+  7: { emoji: '\u{1F525}', text: "7-day streak! A whole week of learning!" },
+  14: { emoji: '\u26A1', text: "14-day streak! Consistency is key!" },
+  30: { emoji: '\u{1F3C6}', text: "30-day streak! A full month \u2014 amazing!" },
+  60: { emoji: '\u{1F48E}', text: "60-day streak! You're unstoppable!" },
+  100: { emoji: '\u{1F451}', text: "100-day streak! Legendary dedication!" },
+  365: { emoji: '\u{1F31F}', text: "365-day streak! A full year! Incredible!" },
 };
 
-const particles = Array.from({ length: 12 }, (_, i) => ({
+interface Particle {
+  angle: number;
+  delay: number;
+  distance: number;
+  size: number;
+  color: string;
+}
+
+const particles: Particle[] = Array.from({ length: 12 }, (_, i) => ({
   angle: (i * 30 * Math.PI) / 180,
   delay: i * 0.05,
   distance: 80 + Math.random() * 40,
@@ -20,8 +33,13 @@ const particles = Array.from({ length: 12 }, (_, i) => ({
   color: ['#6366f1', '#a855f7', '#ec4899', '#f59e0b', '#10b981', '#06b6d4'][i % 6],
 }));
 
-export default function StreakCelebration({ milestone, onClose }) {
-  const msg = messages[milestone];
+interface StreakCelebrationProps {
+  milestone: number | null;
+  onClose: () => void;
+}
+
+export default function StreakCelebration({ milestone, onClose }: StreakCelebrationProps) {
+  const msg = milestone ? messages[milestone] : null;
   if (!msg) return null;
 
   return (
