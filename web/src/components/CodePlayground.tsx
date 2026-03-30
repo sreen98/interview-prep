@@ -1390,6 +1390,1070 @@ test("No anagrams", groupAnagrams(["abc","def","ghi"]), [["abc"],["def"],["ghi"]
       },
     ],
   },
+  {
+    label: 'React Machine Coding',
+    tag: 'React',
+    templates: [
+      {
+        name: 'Pagination',
+        jsx: true,
+        code: `// ===== MACHINE CODING: Pagination Component =====
+// Build a paginated list that fetches data from a simulated API.
+// - Display items for the current page
+// - Show page navigation (prev/next + page numbers)
+// - Handle loading state
+// - Highlight the active page
+
+// Simulated API
+const ALL_ITEMS = Array.from({ length: 50 }, (_, i) => ({
+  id: i + 1,
+  title: \`Item #\${i + 1}\`,
+  desc: \`Description for item \${i + 1}\`,
+}));
+
+function fakeFetch(page, perPage = 5) {
+  return new Promise(resolve =>
+    setTimeout(() => resolve({
+      data: ALL_ITEMS.slice((page - 1) * perPage, page * perPage),
+      total: ALL_ITEMS.length,
+    }), 300)
+  );
+}
+
+function Pagination() {
+  const [items, setItems] = React.useState([]);
+  const [page, setPage] = React.useState(1);
+  const [totalPages, setTotalPages] = React.useState(0);
+  const [loading, setLoading] = React.useState(false);
+  const perPage = 5;
+
+  React.useEffect(() => {
+    setLoading(true);
+    fakeFetch(page, perPage).then(res => {
+      setItems(res.data);
+      setTotalPages(Math.ceil(res.total / perPage));
+      setLoading(false);
+    });
+  }, [page]);
+
+  const pageNums = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+  return (
+    <div style={{ padding: 24, fontFamily: "system-ui", maxWidth: 420 }}>
+      <h3 style={{ marginTop: 0 }}>Paginated List</h3>
+      {loading ? (
+        <p style={{ color: "#888" }}>Loading...</p>
+      ) : (
+        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+          {items.map(item => (
+            <li key={item.id} style={{
+              padding: "10px 12px", marginBottom: 6, background: "#f5f5f5",
+              borderRadius: 8, border: "1px solid #e0e0e0"
+            }}>
+              <strong>{item.title}</strong>
+              <div style={{ fontSize: 13, color: "#666" }}>{item.desc}</div>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div style={{ display: "flex", gap: 4, marginTop: 16, alignItems: "center", flexWrap: "wrap" }}>
+        <button disabled={page === 1} onClick={() => setPage(p => p - 1)}
+          style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #ccc", cursor: page === 1 ? "default" : "pointer" }}>
+          Prev
+        </button>
+        {pageNums.map(n => (
+          <button key={n} onClick={() => setPage(n)}
+            style={{
+              padding: "6px 10px", borderRadius: 6, border: "1px solid #ccc",
+              background: n === page ? "#4f46e5" : "#fff",
+              color: n === page ? "#fff" : "#333",
+              fontWeight: n === page ? 700 : 400, cursor: "pointer",
+            }}>
+            {n}
+          </button>
+        ))}
+        <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)}
+          style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #ccc", cursor: page === totalPages ? "default" : "pointer" }}>
+          Next
+        </button>
+      </div>
+      <p style={{ color: "#999", fontSize: 12, marginTop: 8 }}>
+        Page {page} of {totalPages} ({ALL_ITEMS.length} items)
+      </p>
+    </div>
+  );
+}
+
+render(<Pagination />);`,
+      },
+      {
+        name: 'Search Filter',
+        jsx: true,
+        code: `// ===== MACHINE CODING: Real-time Search Filter =====
+// Build a search filter for a product list.
+// - Filter items as the user types (real-time)
+// - Case-insensitive matching on name and category
+// - Show match count
+// - Highlight "no results" state
+
+const PRODUCTS = [
+  { id: 1, name: "MacBook Pro", category: "Laptops", price: 1999 },
+  { id: 2, name: "iPhone 15", category: "Phones", price: 999 },
+  { id: 3, name: "AirPods Pro", category: "Audio", price: 249 },
+  { id: 4, name: "iPad Air", category: "Tablets", price: 599 },
+  { id: 5, name: "Apple Watch", category: "Wearables", price: 399 },
+  { id: 6, name: "Samsung Galaxy S24", category: "Phones", price: 849 },
+  { id: 7, name: "Sony WH-1000XM5", category: "Audio", price: 349 },
+  { id: 8, name: "Dell XPS 15", category: "Laptops", price: 1499 },
+  { id: 9, name: "Google Pixel 8", category: "Phones", price: 699 },
+  { id: 10, name: "Nintendo Switch", category: "Gaming", price: 299 },
+  { id: 11, name: "Steam Deck", category: "Gaming", price: 449 },
+  { id: 12, name: "Kindle Paperwhite", category: "Tablets", price: 139 },
+];
+
+function SearchFilter() {
+  const [query, setQuery] = React.useState("");
+
+  const filtered = React.useMemo(() => {
+    const q = query.toLowerCase().trim();
+    if (!q) return PRODUCTS;
+    return PRODUCTS.filter(p =>
+      p.name.toLowerCase().includes(q) ||
+      p.category.toLowerCase().includes(q)
+    );
+  }, [query]);
+
+  return (
+    <div style={{ padding: 24, fontFamily: "system-ui", maxWidth: 460 }}>
+      <h3 style={{ marginTop: 0 }}>Product Search</h3>
+      <input
+        value={query}
+        onChange={e => setQuery(e.target.value)}
+        placeholder="Search by name or category..."
+        style={{
+          width: "100%", padding: "10px 14px", borderRadius: 8,
+          border: "1px solid #ddd", fontSize: 14, boxSizing: "border-box",
+        }}
+      />
+      <p style={{ fontSize: 13, color: "#888", margin: "8px 0" }}>
+        Showing {filtered.length} of {PRODUCTS.length} products
+      </p>
+      {filtered.length === 0 ? (
+        <div style={{ textAlign: "center", padding: 32, color: "#999" }}>
+          No products match "{query}"
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {filtered.map(p => (
+            <div key={p.id} style={{
+              padding: "10px 14px", background: "#f8f8f8", borderRadius: 8,
+              border: "1px solid #eee", display: "flex", justifyContent: "space-between",
+              alignItems: "center",
+            }}>
+              <div>
+                <strong>{p.name}</strong>
+                <div style={{ fontSize: 12, color: "#888" }}>{p.category}</div>
+              </div>
+              <span style={{ fontWeight: 600, color: "#4f46e5" }}>\${p.price}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+render(<SearchFilter />);`,
+      },
+      {
+        name: 'Chat App',
+        jsx: true,
+        code: `// ===== MACHINE CODING: Real-time Chat Application =====
+// Build a chat app with multiple users.
+// - Switch between users
+// - Send messages
+// - Messages appear in real-time
+// - Auto-scroll to latest message
+// - Simulated bot replies
+
+function ChatApp() {
+  const [messages, setMessages] = React.useState([
+    { id: 1, user: "Alice", text: "Hey! Ready for the interview prep?", time: "10:00 AM" },
+    { id: 2, user: "Bob", text: "Yes! Let's discuss React patterns.", time: "10:01 AM" },
+  ]);
+  const [input, setInput] = React.useState("");
+  const [currentUser, setCurrentUser] = React.useState("Alice");
+  const bottomRef = React.useRef(null);
+  const users = ["Alice", "Bob", "Charlie"];
+
+  const userColors = { Alice: "#4f46e5", Bob: "#059669", Charlie: "#d97706" };
+
+  React.useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const sendMessage = () => {
+    if (!input.trim()) return;
+    const now = new Date();
+    const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    setMessages(prev => [...prev, {
+      id: Date.now(), user: currentUser, text: input.trim(), time,
+    }]);
+    setInput("");
+
+    // Simulate a reply from another user
+    const others = users.filter(u => u !== currentUser);
+    const replier = others[Math.floor(Math.random() * others.length)];
+    setTimeout(() => {
+      const replyTime = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      const replies = ["That's a great point!", "I agree!", "Can you elaborate?", "Interesting approach!", "Let me think about that..."];
+      setMessages(prev => [...prev, {
+        id: Date.now(), user: replier,
+        text: replies[Math.floor(Math.random() * replies.length)], time: replyTime,
+      }]);
+    }, 1000 + Math.random() * 1500);
+  };
+
+  return (
+    <div style={{ fontFamily: "system-ui", maxWidth: 440, border: "1px solid #e0e0e0", borderRadius: 12, overflow: "hidden" }}>
+      {/* Header */}
+      <div style={{ padding: "12px 16px", background: "#4f46e5", color: "#fff" }}>
+        <strong>Chat Room</strong>
+        <div style={{ fontSize: 12, opacity: 0.8 }}>{users.length} participants</div>
+      </div>
+
+      {/* User switcher */}
+      <div style={{ display: "flex", gap: 4, padding: "8px 12px", background: "#f5f5f5", borderBottom: "1px solid #e0e0e0" }}>
+        {users.map(u => (
+          <button key={u} onClick={() => setCurrentUser(u)}
+            style={{
+              padding: "4px 12px", borderRadius: 16, border: "none", fontSize: 12,
+              background: u === currentUser ? userColors[u] : "#e0e0e0",
+              color: u === currentUser ? "#fff" : "#333", cursor: "pointer",
+            }}>
+            {u}
+          </button>
+        ))}
+      </div>
+
+      {/* Messages */}
+      <div style={{ height: 280, overflowY: "auto", padding: 12, display: "flex", flexDirection: "column", gap: 8 }}>
+        {messages.map(msg => {
+          const isMe = msg.user === currentUser;
+          return (
+            <div key={msg.id} style={{ display: "flex", flexDirection: "column", alignItems: isMe ? "flex-end" : "flex-start" }}>
+              <span style={{ fontSize: 11, color: userColors[msg.user], fontWeight: 600, marginBottom: 2 }}>
+                {msg.user}
+              </span>
+              <div style={{
+                padding: "8px 12px", borderRadius: 12, maxWidth: "75%", fontSize: 14,
+                background: isMe ? "#4f46e5" : "#f0f0f0",
+                color: isMe ? "#fff" : "#333",
+              }}>
+                {msg.text}
+              </div>
+              <span style={{ fontSize: 10, color: "#999", marginTop: 2 }}>{msg.time}</span>
+            </div>
+          );
+        })}
+        <div ref={bottomRef} />
+      </div>
+
+      {/* Input */}
+      <div style={{ display: "flex", gap: 8, padding: 12, borderTop: "1px solid #e0e0e0" }}>
+        <input
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && sendMessage()}
+          placeholder={\`Message as \${currentUser}...\`}
+          style={{ flex: 1, padding: "8px 12px", borderRadius: 8, border: "1px solid #ddd", fontSize: 14 }}
+        />
+        <button onClick={sendMessage}
+          style={{ padding: "8px 16px", borderRadius: 8, background: "#4f46e5", color: "#fff", border: "none", cursor: "pointer" }}>
+          Send
+        </button>
+      </div>
+    </div>
+  );
+}
+
+render(<ChatApp />);`,
+      },
+      {
+        name: 'Modal Component',
+        jsx: true,
+        code: `// ===== MACHINE CODING: Reusable Modal Component =====
+// Build a reusable modal that:
+// - Can be triggered by different buttons
+// - Handles different content types (text, form, confirmation)
+// - Has a close button and backdrop click to dismiss
+// - Supports keyboard (Escape to close)
+// - Animates in/out
+
+function Modal({ isOpen, onClose, title, children }) {
+  React.useEffect(() => {
+    const handleKey = (e) => { if (e.key === "Escape") onClose(); };
+    if (isOpen) document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div onClick={onClose} style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      zIndex: 1000, animation: "fadeIn 0.2s ease",
+    }}>
+      <div onClick={e => e.stopPropagation()} style={{
+        background: "#fff", borderRadius: 12, padding: 24, minWidth: 320,
+        maxWidth: "90%", maxHeight: "80vh", overflowY: "auto",
+        boxShadow: "0 20px 60px rgba(0,0,0,0.3)", animation: "slideUp 0.2s ease",
+      }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+          <h3 style={{ margin: 0 }}>{title}</h3>
+          <button onClick={onClose}
+            style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#999", padding: 4 }}>
+            x
+          </button>
+        </div>
+        {children}
+      </div>
+      <style>{\`
+        @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px) } to { opacity: 1; transform: translateY(0) } }
+      \`}</style>
+    </div>
+  );
+}
+
+function App() {
+  const [activeModal, setActiveModal] = React.useState(null);
+  const [formData, setFormData] = React.useState({ name: "", email: "" });
+
+  const close = () => setActiveModal(null);
+
+  return (
+    <div style={{ padding: 24, fontFamily: "system-ui" }}>
+      <h3 style={{ marginTop: 0 }}>Reusable Modal</h3>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <button onClick={() => setActiveModal("info")}
+          style={{ padding: "8px 16px", borderRadius: 8, background: "#4f46e5", color: "#fff", border: "none", cursor: "pointer" }}>
+          Info Modal
+        </button>
+        <button onClick={() => setActiveModal("form")}
+          style={{ padding: "8px 16px", borderRadius: 8, background: "#059669", color: "#fff", border: "none", cursor: "pointer" }}>
+          Form Modal
+        </button>
+        <button onClick={() => setActiveModal("confirm")}
+          style={{ padding: "8px 16px", borderRadius: 8, background: "#dc2626", color: "#fff", border: "none", cursor: "pointer" }}>
+          Confirm Modal
+        </button>
+      </div>
+      <p style={{ color: "#888", fontSize: 13 }}>Press Escape or click backdrop to close</p>
+
+      {/* Info Modal */}
+      <Modal isOpen={activeModal === "info"} onClose={close} title="Information">
+        <p style={{ color: "#555", lineHeight: 1.6 }}>
+          This is a reusable modal component. It supports different content types,
+          keyboard dismissal (Escape), and backdrop click to close.
+        </p>
+        <button onClick={close}
+          style={{ padding: "8px 20px", borderRadius: 8, background: "#4f46e5", color: "#fff", border: "none", cursor: "pointer" }}>
+          Got it
+        </button>
+      </Modal>
+
+      {/* Form Modal */}
+      <Modal isOpen={activeModal === "form"} onClose={close} title="Contact Form">
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <input placeholder="Name" value={formData.name}
+            onChange={e => setFormData(f => ({ ...f, name: e.target.value }))}
+            style={{ padding: 10, borderRadius: 8, border: "1px solid #ddd" }} />
+          <input placeholder="Email" value={formData.email}
+            onChange={e => setFormData(f => ({ ...f, email: e.target.value }))}
+            style={{ padding: 10, borderRadius: 8, border: "1px solid #ddd" }} />
+          <button onClick={() => { console.log("Submitted:", formData); close(); }}
+            style={{ padding: "10px 20px", borderRadius: 8, background: "#059669", color: "#fff", border: "none", cursor: "pointer" }}>
+            Submit
+          </button>
+        </div>
+      </Modal>
+
+      {/* Confirm Modal */}
+      <Modal isOpen={activeModal === "confirm"} onClose={close} title="Are you sure?">
+        <p style={{ color: "#555" }}>This action cannot be undone. Do you want to proceed?</p>
+        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+          <button onClick={close}
+            style={{ padding: "8px 20px", borderRadius: 8, background: "#e5e5e5", border: "none", cursor: "pointer" }}>
+            Cancel
+          </button>
+          <button onClick={() => { console.log("Confirmed!"); close(); }}
+            style={{ padding: "8px 20px", borderRadius: 8, background: "#dc2626", color: "#fff", border: "none", cursor: "pointer" }}>
+            Delete
+          </button>
+        </div>
+      </Modal>
+    </div>
+  );
+}
+
+render(<App />);`,
+      },
+      {
+        name: 'Image Gallery + Lazy Load',
+        jsx: true,
+        code: `// ===== MACHINE CODING: Image Gallery with Lazy Loading =====
+// Build an image gallery that:
+// - Lazy loads images as they enter the viewport
+// - Uses IntersectionObserver for efficient loading
+// - Shows placeholder while loading
+// - Displays in a responsive grid
+
+function LazyImage({ src, alt, style }) {
+  const [loaded, setLoaded] = React.useState(false);
+  const [inView, setInView] = React.useState(false);
+  const ref = React.useRef(null);
+
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setInView(true); observer.disconnect(); } },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} style={{
+      ...style, background: loaded ? "transparent" : "#e0e0e0",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      overflow: "hidden", position: "relative",
+    }}>
+      {!loaded && (
+        <div style={{ color: "#999", fontSize: 13 }}>Loading...</div>
+      )}
+      {inView && (
+        <img
+          src={src} alt={alt}
+          onLoad={() => setLoaded(true)}
+          style={{
+            width: "100%", height: "100%", objectFit: "cover",
+            opacity: loaded ? 1 : 0, transition: "opacity 0.4s ease",
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function ImageGallery() {
+  // Generate placeholder image URLs with different colors
+  const images = Array.from({ length: 24 }, (_, i) => {
+    const hue = (i * 37) % 360;
+    const id = i + 10;
+    return {
+      id: i,
+      src: \`https://picsum.photos/seed/\${id}/400/300\`,
+      alt: \`Photo \${i + 1}\`,
+      color: \`hsl(\${hue}, 60%, 70%)\`,
+    };
+  });
+
+  return (
+    <div style={{ padding: 16, fontFamily: "system-ui" }}>
+      <h3 style={{ marginTop: 0 }}>Lazy-Loaded Image Gallery</h3>
+      <p style={{ color: "#888", fontSize: 13, marginBottom: 16 }}>
+        Scroll down to see images load as they enter the viewport
+      </p>
+      <div style={{
+        display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+        gap: 8, maxHeight: 400, overflowY: "auto", padding: 4,
+      }}>
+        {images.map(img => (
+          <LazyImage
+            key={img.id}
+            src={img.src}
+            alt={img.alt}
+            style={{
+              height: 120, borderRadius: 8, background: img.color,
+              border: "1px solid #e0e0e0",
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+render(<ImageGallery />);`,
+      },
+      {
+        name: 'Drag and Drop',
+        jsx: true,
+        code: `// ===== MACHINE CODING: Drag-and-Drop Interface =====
+// Build a drag-and-drop interface to:
+// - Reorder items within a list
+// - Drag items between two lists
+// - Visual feedback during drag
+
+function DragDropApp() {
+  const [todo, setTodo] = React.useState([
+    { id: "1", text: "Learn React hooks" },
+    { id: "2", text: "Build a portfolio" },
+    { id: "3", text: "Study system design" },
+    { id: "4", text: "Practice algorithms" },
+  ]);
+  const [done, setDone] = React.useState([
+    { id: "5", text: "Setup dev environment" },
+    { id: "6", text: "Read React docs" },
+  ]);
+  const [dragItem, setDragItem] = React.useState(null);
+  const [dragOver, setDragOver] = React.useState(null);
+
+  const handleDragStart = (item, source) => {
+    setDragItem({ ...item, source });
+  };
+
+  const handleDrop = (target) => {
+    if (!dragItem) return;
+    const { source } = dragItem;
+    const item = { id: dragItem.id, text: dragItem.text };
+
+    // Remove from source
+    if (source === "todo") setTodo(prev => prev.filter(i => i.id !== item.id));
+    else setDone(prev => prev.filter(i => i.id !== item.id));
+
+    // Add to target
+    if (target === "todo") setTodo(prev => [...prev, item]);
+    else setDone(prev => [...prev, item]);
+
+    setDragItem(null);
+    setDragOver(null);
+  };
+
+  const renderList = (items, listId, title, color) => (
+    <div
+      onDragOver={e => { e.preventDefault(); setDragOver(listId); }}
+      onDragLeave={() => setDragOver(null)}
+      onDrop={() => handleDrop(listId)}
+      style={{
+        flex: 1, minWidth: 180, padding: 12, borderRadius: 12,
+        background: dragOver === listId ? \`\${color}22\` : "#f8f8f8",
+        border: \`2px dashed \${dragOver === listId ? color : "#e0e0e0"}\`,
+        transition: "all 0.2s ease",
+      }}
+    >
+      <h4 style={{ margin: "0 0 12px", color, display: "flex", justifyContent: "space-between" }}>
+        {title}
+        <span style={{
+          background: color, color: "#fff", borderRadius: 12,
+          padding: "2px 10px", fontSize: 13,
+        }}>
+          {items.length}
+        </span>
+      </h4>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6, minHeight: 60 }}>
+        {items.map(item => (
+          <div
+            key={item.id}
+            draggable
+            onDragStart={() => handleDragStart(item, listId)}
+            onDragEnd={() => { setDragItem(null); setDragOver(null); }}
+            style={{
+              padding: "10px 12px", background: "#fff", borderRadius: 8,
+              border: "1px solid #e0e0e0", cursor: "grab", fontSize: 14,
+              opacity: dragItem?.id === item.id ? 0.5 : 1,
+              transition: "opacity 0.2s",
+            }}
+          >
+            {item.text}
+          </div>
+        ))}
+        {items.length === 0 && (
+          <div style={{ padding: 20, textAlign: "center", color: "#bbb", fontSize: 13 }}>
+            Drop items here
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={{ padding: 20, fontFamily: "system-ui" }}>
+      <h3 style={{ marginTop: 0 }}>Drag & Drop Lists</h3>
+      <p style={{ color: "#888", fontSize: 13, marginBottom: 12 }}>
+        Drag items between the two lists
+      </p>
+      <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+        {renderList(todo, "todo", "To Do", "#d97706")}
+        {renderList(done, "done", "Done", "#059669")}
+      </div>
+    </div>
+  );
+}
+
+render(<DragDropApp />);`,
+      },
+      {
+        name: 'Product List Sort & Filter',
+        jsx: true,
+        code: `// ===== MACHINE CODING: Product List with Sorting & Filtering =====
+// Build a product list with:
+// - Sort by price or rating (asc/desc)
+// - Filter by category and price range
+// - Show active filters and clear option
+
+const PRODUCTS = [
+  { id: 1, name: "Wireless Headphones", category: "Audio", price: 79, rating: 4.5 },
+  { id: 2, name: "Bluetooth Speaker", category: "Audio", price: 49, rating: 4.2 },
+  { id: 3, name: "USB-C Hub", category: "Accessories", price: 35, rating: 4.0 },
+  { id: 4, name: "Mechanical Keyboard", category: "Peripherals", price: 129, rating: 4.7 },
+  { id: 5, name: "Gaming Mouse", category: "Peripherals", price: 59, rating: 4.4 },
+  { id: 6, name: "Webcam HD", category: "Accessories", price: 69, rating: 3.9 },
+  { id: 7, name: "Monitor Stand", category: "Accessories", price: 45, rating: 4.1 },
+  { id: 8, name: "Noise Cancelling Earbuds", category: "Audio", price: 149, rating: 4.6 },
+  { id: 9, name: "Laptop Stand", category: "Accessories", price: 39, rating: 4.3 },
+  { id: 10, name: "Wireless Mouse", category: "Peripherals", price: 29, rating: 3.8 },
+  { id: 11, name: "Desk Pad", category: "Accessories", price: 25, rating: 4.0 },
+  { id: 12, name: "Studio Mic", category: "Audio", price: 199, rating: 4.8 },
+];
+
+const categories = [...new Set(PRODUCTS.map(p => p.category))];
+
+function ProductList() {
+  const [sortBy, setSortBy] = React.useState("name");
+  const [sortDir, setSortDir] = React.useState("asc");
+  const [category, setCategory] = React.useState("all");
+  const [maxPrice, setMaxPrice] = React.useState(200);
+
+  const filtered = React.useMemo(() => {
+    let items = PRODUCTS.filter(p => p.price <= maxPrice);
+    if (category !== "all") items = items.filter(p => p.category === category);
+    items.sort((a, b) => {
+      const va = a[sortBy], vb = b[sortBy];
+      const cmp = typeof va === "string" ? va.localeCompare(vb) : va - vb;
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+    return items;
+  }, [sortBy, sortDir, category, maxPrice]);
+
+  const toggleSort = (field) => {
+    if (sortBy === field) setSortDir(d => d === "asc" ? "desc" : "asc");
+    else { setSortBy(field); setSortDir("asc"); }
+  };
+
+  const clearFilters = () => { setCategory("all"); setMaxPrice(200); setSortBy("name"); setSortDir("asc"); };
+
+  return (
+    <div style={{ padding: 20, fontFamily: "system-ui", maxWidth: 480 }}>
+      <h3 style={{ marginTop: 0 }}>Product List</h3>
+
+      {/* Filters */}
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+        <select value={category} onChange={e => setCategory(e.target.value)}
+          style={{ padding: "6px 10px", borderRadius: 6, border: "1px solid #ddd" }}>
+          <option value="all">All Categories</option>
+          {categories.map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontSize: 13 }}>Max $</span>
+          <input type="range" min={0} max={200} value={maxPrice}
+            onChange={e => setMaxPrice(Number(e.target.value))} style={{ width: 100 }} />
+          <span style={{ fontSize: 13, fontWeight: 600 }}>\${maxPrice}</span>
+        </div>
+        <button onClick={clearFilters}
+          style={{ padding: "6px 12px", borderRadius: 6, background: "#f0f0f0", border: "1px solid #ddd", cursor: "pointer", fontSize: 12 }}>
+          Clear
+        </button>
+      </div>
+
+      {/* Sort buttons */}
+      <div style={{ display: "flex", gap: 4, marginBottom: 12 }}>
+        {[["name", "Name"], ["price", "Price"], ["rating", "Rating"]].map(([key, label]) => (
+          <button key={key} onClick={() => toggleSort(key)}
+            style={{
+              padding: "4px 12px", borderRadius: 6, fontSize: 12, cursor: "pointer",
+              background: sortBy === key ? "#4f46e5" : "#f0f0f0",
+              color: sortBy === key ? "#fff" : "#333",
+              border: sortBy === key ? "1px solid #4f46e5" : "1px solid #ddd",
+            }}>
+            {label} {sortBy === key ? (sortDir === "asc" ? " \\u2191" : " \\u2193") : ""}
+          </button>
+        ))}
+      </div>
+
+      {/* Product cards */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        {filtered.length === 0 ? (
+          <p style={{ textAlign: "center", color: "#999", padding: 20 }}>No products match your filters</p>
+        ) : filtered.map(p => (
+          <div key={p.id} style={{
+            padding: "10px 14px", background: "#f8f8f8", borderRadius: 8,
+            border: "1px solid #eee", display: "flex", justifyContent: "space-between", alignItems: "center",
+          }}>
+            <div>
+              <strong>{p.name}</strong>
+              <div style={{ fontSize: 12, color: "#888" }}>{p.category}</div>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <div style={{ fontWeight: 600, color: "#4f46e5" }}>\${p.price}</div>
+              <div style={{ fontSize: 12, color: "#f59e0b" }}>{"\\u2605".repeat(Math.round(p.rating))} {p.rating}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <p style={{ fontSize: 12, color: "#999", marginTop: 8 }}>{filtered.length} products shown</p>
+    </div>
+  );
+}
+
+render(<ProductList />);`,
+      },
+      {
+        name: 'Responsive Navbar',
+        jsx: true,
+        code: `// ===== MACHINE CODING: Responsive Navbar =====
+// Build a responsive navbar that:
+// - Shows full menu on desktop
+// - Collapses to hamburger menu on mobile
+// - Smooth slide-in mobile menu
+// - Active link highlighting
+// - Resize to see it adapt!
+
+function Navbar() {
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const [active, setActive] = React.useState("Home");
+  const [width, setWidth] = React.useState(400);
+
+  const links = ["Home", "About", "Services", "Portfolio", "Blog", "Contact"];
+
+  const isMobile = width < 500;
+
+  return (
+    <div style={{ fontFamily: "system-ui" }}>
+      <p style={{ fontSize: 13, color: "#888", margin: "0 0 8px", padding: "0 8px" }}>
+        Drag slider to simulate viewport: {width}px
+      </p>
+      <input type="range" min={280} max={700} value={width}
+        onChange={e => { setWidth(Number(e.target.value)); setMenuOpen(false); }}
+        style={{ width: "100%", marginBottom: 12 }} />
+
+      {/* Simulated viewport */}
+      <div style={{ width, margin: "0 auto", border: "2px solid #ddd", borderRadius: 12, overflow: "hidden", transition: "width 0.3s" }}>
+        <nav style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "12px 16px", background: "#1a1a2e", color: "#fff", position: "relative",
+        }}>
+          <div style={{ fontWeight: 700, fontSize: 18, color: "#818cf8" }}>PrepHub</div>
+
+          {/* Desktop links */}
+          {!isMobile && (
+            <div style={{ display: "flex", gap: 4 }}>
+              {links.map(link => (
+                <button key={link} onClick={() => setActive(link)}
+                  style={{
+                    background: active === link ? "#4f46e5" : "transparent",
+                    color: "#fff", border: "none", padding: "6px 12px",
+                    borderRadius: 6, cursor: "pointer", fontSize: 13,
+                    transition: "background 0.2s",
+                  }}>
+                  {link}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Hamburger */}
+          {isMobile && (
+            <button onClick={() => setMenuOpen(m => !m)}
+              style={{
+                background: "none", border: "none", color: "#fff",
+                fontSize: 22, cursor: "pointer", padding: 4, lineHeight: 1,
+              }}>
+              {menuOpen ? "\\u2715" : "\\u2630"}
+            </button>
+          )}
+        </nav>
+
+        {/* Mobile menu */}
+        {isMobile && (
+          <div style={{
+            maxHeight: menuOpen ? links.length * 48 : 0,
+            overflow: "hidden", background: "#16162a",
+            transition: "max-height 0.3s ease",
+          }}>
+            {links.map(link => (
+              <button key={link}
+                onClick={() => { setActive(link); setMenuOpen(false); }}
+                style={{
+                  display: "block", width: "100%", textAlign: "left",
+                  padding: "12px 20px", background: active === link ? "#4f46e5" : "transparent",
+                  color: "#fff", border: "none", borderTop: "1px solid #2a2a4a",
+                  cursor: "pointer", fontSize: 14,
+                }}>
+                {link}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Page content */}
+        <div style={{ padding: 24, background: "#fff", minHeight: 120 }}>
+          <h2 style={{ margin: "0 0 8px", color: "#1a1a2e" }}>{active}</h2>
+          <p style={{ color: "#888", fontSize: 14, margin: 0 }}>
+            This is the {active.toLowerCase()} page content. Resize the viewport above to see the navbar adapt.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+render(<Navbar />);`,
+      },
+      {
+        name: 'Infinite Scroll',
+        jsx: true,
+        code: `// ===== MACHINE CODING: Infinite Scrolling List =====
+// Build an infinite scrolling list that:
+// - Loads more items when scrolling near the bottom
+// - Uses IntersectionObserver (no scroll event listener)
+// - Shows loading indicator
+// - Handles "no more data" state
+
+function fakeAPI(page) {
+  const totalPages = 8;
+  return new Promise(resolve =>
+    setTimeout(() => {
+      if (page > totalPages) return resolve({ items: [], hasMore: false });
+      const items = Array.from({ length: 10 }, (_, i) => ({
+        id: (page - 1) * 10 + i + 1,
+        title: \`Post #\${(page - 1) * 10 + i + 1}\`,
+        body: \`This is the content for post \${(page - 1) * 10 + i + 1}. It was loaded on page \${page}.\`,
+        author: ["Alice", "Bob", "Charlie", "Diana"][((page - 1) * 10 + i) % 4],
+      }));
+      resolve({ items, hasMore: page < totalPages });
+    }, 500 + Math.random() * 500)
+  );
+}
+
+function InfiniteScroll() {
+  const [items, setItems] = React.useState([]);
+  const [page, setPage] = React.useState(1);
+  const [loading, setLoading] = React.useState(false);
+  const [hasMore, setHasMore] = React.useState(true);
+  const sentinelRef = React.useRef(null);
+
+  const loadMore = React.useCallback(() => {
+    if (loading || !hasMore) return;
+    setLoading(true);
+    fakeAPI(page).then(res => {
+      setItems(prev => [...prev, ...res.items]);
+      setHasMore(res.hasMore);
+      setPage(p => p + 1);
+      setLoading(false);
+    });
+  }, [page, loading, hasMore]);
+
+  // Initial load
+  React.useEffect(() => { loadMore(); }, []);
+
+  // IntersectionObserver for sentinel element
+  React.useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) loadMore(); },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [loadMore]);
+
+  const colors = { Alice: "#4f46e5", Bob: "#059669", Charlie: "#d97706", Diana: "#dc2626" };
+
+  return (
+    <div style={{ padding: 20, fontFamily: "system-ui", maxWidth: 440 }}>
+      <h3 style={{ marginTop: 0 }}>Infinite Scroll Feed</h3>
+      <p style={{ fontSize: 13, color: "#888", marginBottom: 12 }}>
+        {items.length} items loaded. {hasMore ? "Scroll down for more." : "All items loaded!"}
+      </p>
+      <div style={{ maxHeight: 400, overflowY: "auto", borderRadius: 12, border: "1px solid #e0e0e0" }}>
+        {items.map(item => (
+          <div key={item.id} style={{
+            padding: "12px 16px", borderBottom: "1px solid #f0f0f0",
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <strong style={{ fontSize: 14 }}>{item.title}</strong>
+              <span style={{
+                fontSize: 11, padding: "2px 8px", borderRadius: 10,
+                background: colors[item.author] + "18", color: colors[item.author],
+                fontWeight: 600,
+              }}>
+                {item.author}
+              </span>
+            </div>
+            <p style={{ margin: "4px 0 0", fontSize: 13, color: "#666" }}>{item.body}</p>
+          </div>
+        ))}
+
+        {/* Sentinel element for IntersectionObserver */}
+        {hasMore && (
+          <div ref={sentinelRef} style={{ padding: 20, textAlign: "center" }}>
+            {loading && <span style={{ color: "#888" }}>Loading more...</span>}
+          </div>
+        )}
+
+        {!hasMore && items.length > 0 && (
+          <div style={{ padding: 16, textAlign: "center", color: "#999", fontSize: 13 }}>
+            You've reached the end!
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+render(<InfiniteScroll />);`,
+      },
+      {
+        name: 'Notifications',
+        jsx: true,
+        code: `// ===== MACHINE CODING: Real-time Notifications =====
+// Build a notifications system that:
+// - Shows toast notifications dynamically
+// - Supports different types (success, error, warning, info)
+// - Auto-dismiss after timeout
+// - Manual dismiss with close button
+// - Stacked positioning with animation
+
+function useNotifications() {
+  const [notifications, setNotifications] = React.useState([]);
+
+  const add = React.useCallback((message, type = "info", duration = 3000) => {
+    const id = Date.now() + Math.random();
+    setNotifications(prev => [...prev, { id, message, type, duration }]);
+    if (duration > 0) {
+      setTimeout(() => {
+        setNotifications(prev => prev.filter(n => n.id !== id));
+      }, duration);
+    }
+  }, []);
+
+  const dismiss = React.useCallback((id) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  }, []);
+
+  return { notifications, add, dismiss };
+}
+
+function Toast({ notification, onDismiss }) {
+  const colors = {
+    success: { bg: "#ecfdf5", border: "#059669", icon: "\\u2705" },
+    error:   { bg: "#fef2f2", border: "#dc2626", icon: "\\u274C" },
+    warning: { bg: "#fffbeb", border: "#d97706", icon: "\\u26A0\\uFE0F" },
+    info:    { bg: "#eff6ff", border: "#3b82f6", icon: "\\u2139\\uFE0F" },
+  };
+  const c = colors[notification.type] || colors.info;
+
+  return (
+    <div style={{
+      display: "flex", alignItems: "center", gap: 10,
+      padding: "10px 14px", borderRadius: 8, marginBottom: 8,
+      background: c.bg, borderLeft: \`4px solid \${c.border}\`,
+      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+      animation: "slideIn 0.3s ease", minWidth: 260,
+    }}>
+      <span style={{ fontSize: 16 }}>{c.icon}</span>
+      <span style={{ flex: 1, fontSize: 13, color: "#333" }}>{notification.message}</span>
+      <button onClick={() => onDismiss(notification.id)}
+        style={{ background: "none", border: "none", cursor: "pointer", color: "#999", fontSize: 16, padding: 2 }}>
+        x
+      </button>
+    </div>
+  );
+}
+
+function App() {
+  const { notifications, add, dismiss } = useNotifications();
+  const [autoCount, setAutoCount] = React.useState(0);
+
+  // Simulate real-time notifications
+  React.useEffect(() => {
+    const events = [
+      { msg: "New message from Alice", type: "info" },
+      { msg: "Deployment successful!", type: "success" },
+      { msg: "High memory usage detected", type: "warning" },
+      { msg: "Build failed on main branch", type: "error" },
+    ];
+    const interval = setInterval(() => {
+      setAutoCount(c => {
+        if (c < 3) {
+          const evt = events[c % events.length];
+          add(evt.msg, evt.type);
+        }
+        return c + 1;
+      });
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div style={{ padding: 20, fontFamily: "system-ui" }}>
+      <style>{\`
+        @keyframes slideIn {
+          from { opacity: 0; transform: translateX(40px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+      \`}</style>
+
+      <h3 style={{ marginTop: 0 }}>Notification System</h3>
+      <p style={{ fontSize: 13, color: "#888", marginBottom: 16 }}>
+        Click buttons or wait for auto-notifications. They dismiss after 3s.
+      </p>
+
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20 }}>
+        <button onClick={() => add("Operation completed!", "success")}
+          style={{ padding: "6px 14px", borderRadius: 6, background: "#059669", color: "#fff", border: "none", cursor: "pointer" }}>
+          Success
+        </button>
+        <button onClick={() => add("Something went wrong!", "error")}
+          style={{ padding: "6px 14px", borderRadius: 6, background: "#dc2626", color: "#fff", border: "none", cursor: "pointer" }}>
+          Error
+        </button>
+        <button onClick={() => add("Please check your input", "warning")}
+          style={{ padding: "6px 14px", borderRadius: 6, background: "#d97706", color: "#fff", border: "none", cursor: "pointer" }}>
+          Warning
+        </button>
+        <button onClick={() => add("You have 3 new updates", "info")}
+          style={{ padding: "6px 14px", borderRadius: 6, background: "#3b82f6", color: "#fff", border: "none", cursor: "pointer" }}>
+          Info
+        </button>
+        <button onClick={() => add("This one stays! Click x to dismiss.", "info", 0)}
+          style={{ padding: "6px 14px", borderRadius: 6, background: "#6b7280", color: "#fff", border: "none", cursor: "pointer" }}>
+          Persistent
+        </button>
+      </div>
+
+      {/* Notification container */}
+      <div style={{ position: "relative" }}>
+        {notifications.length === 0 ? (
+          <p style={{ color: "#ccc", fontSize: 13 }}>No notifications. Click a button or wait...</p>
+        ) : (
+          notifications.map(n => <Toast key={n.id} notification={n} onDismiss={dismiss} />)
+        )}
+      </div>
+    </div>
+  );
+}
+
+render(<App />);`,
+      },
+    ],
+  },
 ];
 
 // Flatten for easy access

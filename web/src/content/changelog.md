@@ -2,6 +2,12 @@
 
 ## Latest (March 2026)
 
+### React Machine Coding Challenges in Playground
+- **10 new interactive templates** — frequently asked React machine coding interview questions
+- Pagination, Search Filter, Real-time Chat, Modal, Image Gallery with Lazy Loading, Drag-and-Drop, Product List with Sort & Filter, Responsive Navbar, Infinite Scroll, and Notifications
+- All challenges are fully functional and runnable in the playground with live preview
+- New "React Machine Coding" category in the template drawer
+
 ### TypeScript Migration
 - Entire codebase migrated from JavaScript to TypeScript (`.jsx` → `.tsx`, `.js` → `.ts`)
 - All components, hooks, and data files now have full type annotations

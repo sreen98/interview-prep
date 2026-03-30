@@ -67,6 +67,7 @@ There are no automated tests. Verify changes by:
 4. Check mobile responsive layout
 
 ## What's New (Latest Changes)
+- **React Machine Coding challenges** — 10 new playground templates: Pagination, Search Filter, Chat App, Modal, Image Gallery + Lazy Load, Drag-and-Drop, Product List Sort & Filter, Responsive Navbar, Infinite Scroll, Notifications
 - **TypeScript migration** — All `.jsx`/`.js` files converted to `.tsx`/`.ts` with type annotations and `tsconfig.json`
 - **Git category** — New sidebar section with Git Guide (internals, branching, rebasing, workflows) and Git Comparisons
 - **Jest & React Testing Library guide** — Added to Front End section covering Jest, RTL patterns, hooks, Redux, forms, routing

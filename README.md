@@ -18,7 +18,7 @@ A comprehensive, modern web app for full-stack developer interview preparation. 
 - **Quiz Mode** — flashcard-style Q&A extracted from guides, with difficulty filters (Beginner/Intermediate/Advanced)
 - **Daily Review** — spaced repetition (SM-2 algorithm) schedules questions for optimal retention
 - **Interview Simulator** — timed mock interviews with configurable question count, time limit, and category selection
-- **Code Playground** — run JavaScript and React/JSX code in-browser with live preview, 16+ templates across JS fundamentals, interview topics, React basics, and polyfills
+- **Code Playground** — run JavaScript and React/JSX code in-browser with live preview, 60+ templates across JS fundamentals, interview topics, React basics, polyfills, coding challenges, and React machine coding questions
 
 ### Study Effectiveness
 - **Progress Tracking** — guides auto-marked as in-progress on visit, manual "Mark Complete" with visual status dots
@@ -55,29 +55,29 @@ A comprehensive, modern web app for full-stack developer interview preparation. 
 interview-prep/
   web/
     src/
-      App.jsx                    # Main app: layout, sidebar, routes, ContentPage, HomePage
-      data.js                    # menuStructure, contentFiles, utilities, cheatSheets
-      main.jsx                   # Entry point (BrowserRouter)
+      App.tsx                    # Main app: layout, sidebar, routes, ContentPage, HomePage
+      data.ts                    # menuStructure, contentFiles, utilities, cheatSheets
+      main.tsx                   # Entry point (BrowserRouter)
       index.css                  # Tailwind + custom styles
       components/
-        QuizMode.jsx             # Flashcard quiz with difficulty/guide filters
-        ReviewPage.jsx           # Spaced repetition daily review
-        InterviewSimulator.jsx   # Timed mock interview (setup/interview/results)
-        CodePlayground.jsx       # JS/React code editor with template drawer
-        BookmarksPage.jsx        # Saved bookmarks listing
-        CheatSheetsIndex.jsx     # Cheat sheet card grid
-        MermaidBlock.jsx         # Lazy mermaid diagram renderer
-        StreakCelebration.jsx    # Streak milestone celebration overlay
-        Toast.jsx                # Reusable toast notification
-        TTSControls.jsx          # Text-to-speech playback controls
+        QuizMode.tsx             # Flashcard quiz with difficulty/guide filters
+        ReviewPage.tsx           # Spaced repetition daily review
+        InterviewSimulator.tsx   # Timed mock interview (setup/interview/results)
+        CodePlayground.tsx       # JS/React code editor with template drawer
+        BookmarksPage.tsx        # Saved bookmarks listing
+        CheatSheetsIndex.tsx     # Cheat sheet card grid
+        MermaidBlock.tsx         # Lazy mermaid diagram renderer
+        StreakCelebration.tsx    # Streak milestone celebration overlay
+        Toast.tsx                # Reusable toast notification
+        TTSControls.tsx          # Text-to-speech playback controls
       hooks/
-        useDarkMode.js           # Theme toggle (localStorage)
-        useReadingPrefs.js       # Font size S/M/L (localStorage)
-        useProgress.js           # Guide completion tracking (localStorage)
-        useBookmarks.js          # Bookmark management (localStorage)
-        useSpacedRepetition.js   # SM-2 algorithm scheduling (localStorage)
-        useStudyStats.js         # Streak & gamification stats (localStorage)
-        useTextToSpeech.js       # Web Speech API wrapper
+        useDarkMode.ts           # Theme toggle (localStorage)
+        useReadingPrefs.ts       # Font size S/M/L (localStorage)
+        useProgress.ts           # Guide completion tracking (localStorage)
+        useBookmarks.ts          # Bookmark management (localStorage)
+        useSpacedRepetition.ts   # SM-2 algorithm scheduling (localStorage)
+        useStudyStats.ts         # Streak & gamification stats (localStorage)
+        useTextToSpeech.ts       # Web Speech API wrapper
       content/
         front-end/               # React, Redux, TanStack Query, Storybook guides
         javascript-and-typescript/
