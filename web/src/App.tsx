@@ -667,6 +667,17 @@ const ContentPage = ({ filePath, guidePath, guideName }) => {
   const proseParagraphs = useMemo(() => extractProseText(content), [content]);
   const guideStatus = guidePath ? getStatus(guidePath) : null;
 
+  // Dynamic page title for SEO
+  useEffect(() => {
+    const pageTitle = guideName ? `${guideName} — PrepHub` : 'PrepHub — Interview Prep';
+    document.title = pageTitle;
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc && guideName) {
+      metaDesc.setAttribute('content', `${guideName} interview preparation guide — PrepHub`);
+    }
+    return () => { document.title = 'PrepHub — Interview Prep'; };
+  }, [guideName]);
+
   // ===== Feature 1: Reading Position Memory =====
   const scrollSaveTimer = useRef(null);
 
@@ -1081,6 +1092,32 @@ export default function App() {
     );
     if (currentSection) {
       setExpandedSections(prev => ({ ...prev, [currentSection.name]: true }));
+    }
+  }, [location.pathname]);
+
+  // Dynamic page titles for non-content pages
+  useEffect(() => {
+    const pageTitles: Record<string, string> = {
+      '/': 'PrepHub — Free Full-Stack Interview Prep Guides',
+      '/quiz': 'Quiz Mode — PrepHub',
+      '/playground': 'Code Playground — PrepHub',
+      '/interview': 'Interview Simulator — PrepHub',
+      '/review': 'Spaced Repetition Review — PrepHub',
+      '/bookmarks': 'Bookmarks — PrepHub',
+      '/cheatsheets': 'Cheat Sheets — PrepHub',
+      '/changelog': "What's New — PrepHub",
+    };
+    const title = pageTitles[location.pathname];
+    if (title) document.title = title;
+  }, [location.pathname]);
+
+  // Track SPA page views in Google Analytics
+  useEffect(() => {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'page_view', {
+        page_path: location.pathname,
+        page_title: document.title,
+      });
     }
   }, [location.pathname]);
 

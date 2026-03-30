@@ -5,3 +5,7 @@ declare module '@babel/standalone' {
   export default babel;
   export function transform(code: string, options: any): { code: string };
 }
+
+interface Window {
+  gtag: (...args: any[]) => void;
+}
