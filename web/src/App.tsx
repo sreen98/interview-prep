@@ -678,42 +678,7 @@ const ContentPage = ({ filePath, guidePath, guideName }) => {
     return () => { document.title = 'PrepHub — Interview Prep'; };
   }, [guideName]);
 
-  // ===== Feature 1: Reading Position Memory =====
-  const scrollSaveTimer = useRef(null);
-
-  useEffect(() => {
-    // Restore scroll position after content renders
-    const restoreTimer = setTimeout(() => {
-      try {
-        const saved = JSON.parse(localStorage.getItem('reading-positions') || '{}');
-        const savedY = saved[filePath];
-        if (savedY && savedY > 0) {
-          window.scrollTo(0, savedY);
-        }
-      } catch { /* ignore parse errors */ }
-    }, 150);
-
-    // Save scroll position on scroll (debounced)
-    const handleScroll = () => {
-      if (scrollSaveTimer.current) clearTimeout(scrollSaveTimer.current);
-      scrollSaveTimer.current = setTimeout(() => {
-        try {
-          const positions = JSON.parse(localStorage.getItem('reading-positions') || '{}');
-          positions[filePath] = window.scrollY;
-          localStorage.setItem('reading-positions', JSON.stringify(positions));
-        } catch { /* ignore storage errors */ }
-      }, 300);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      clearTimeout(restoreTimer);
-      if (scrollSaveTimer.current) clearTimeout(scrollSaveTimer.current);
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [filePath]);
-
-  // ===== Feature 2: Related Guides Suggestions =====
+  // ===== Feature 1: Related Guides Suggestions =====
   const relatedGuides = useMemo(() => {
     if (!guidePath) return [];
     // Find current category
@@ -1123,12 +1088,7 @@ export default function App() {
 
   useEffect(() => {
     setIsSidebarOpen(false);
-    // Only scroll to top for non-content pages; content pages restore their saved reading position
-    const isGuide = menuStructure.some(s => s.items?.some(i => i.path === location.pathname));
-    const isCheatsheet = cheatSheets.some(cs => cs.path === location.pathname);
-    if (!isGuide && !isCheatsheet) {
-      window.scrollTo(0, 0);
-    }
+    window.scrollTo(0, 0);
   }, [location.pathname]);
 
   useEffect(() => {
