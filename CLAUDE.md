@@ -66,7 +66,14 @@ There are no automated tests. Verify changes by:
 3. Check both light and dark mode
 4. Check mobile responsive layout
 
+## After making changes
+When any changes are made to this project, update the following files if required:
+- **`CLAUDE.md`** — Update this file if the change affects architecture, patterns, content structure, or instructions (e.g., new categories, new components, new conventions).
+- **`README.md`** — Update if the change is user-facing (new features, new guides, updated counts, tech stack changes).
+- **`web/src/content/changelog.md`** — Update if the change is something the end user should see (new content, new features, UI changes, bug fixes). This powers the in-app "What's New" modal.
+
 ## What's New (Latest Changes)
+- **Frontend Tooling guide** — New Front End guide covering Webpack, Vite, npm/yarn/pnpm, bundler comparisons, package.json, npx, and 20 interview Q&A
 - **React Machine Coding challenges** — 10 new playground templates: Pagination, Search Filter, Chat App, Modal, Image Gallery + Lazy Load, Drag-and-Drop, Product List Sort & Filter, Responsive Navbar, Infinite Scroll, Notifications
 - **TypeScript migration** — All `.jsx`/`.js` files converted to `.tsx`/`.ts` with type annotations and `tsconfig.json`
 - **Git category** — New sidebar section with Git Guide (internals, branching, rebasing, workflows) and Git Comparisons

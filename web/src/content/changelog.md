@@ -1,6 +1,18 @@
 # What's New
 
-## Latest (March 2026)
+## Latest (April 2026)
+
+### New Content: Frontend Tooling Guide
+- Comprehensive guide covering **Webpack, Vite, and bundler fundamentals** — why React needs a bundler, how webpack works (loaders, plugins, code splitting), how Vite leverages native ES modules
+- **Webpack vs Vite comparison** — dev speed, config complexity, ecosystem, migration steps from CRA
+- **Other bundlers overview** — Rollup, esbuild, Parcel, Turbopack, SWC
+- **Package managers** — npm vs yarn vs pnpm deep dive with resolution strategies, speed, and monorepo support
+- **package.json deep dive** — dependencies vs devDependencies vs peerDependencies, semver, scripts, entry points
+- **20 interview questions** across beginner, intermediate, and advanced levels
+
+---
+
+## March 2026
 
 ### React Machine Coding Challenges in Playground
 - **10 new interactive templates** — frequently asked React machine coding interview questions

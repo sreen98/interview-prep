@@ -73,6 +73,7 @@ export const menuStructure: MenuSection[] = [
       { name: 'TanStack Query', path: '/frontend/tanstack-query', file: './content/front-end/tanstack-query-guide.md', officialDocs: [{ label: 'TanStack Query', url: 'https://tanstack.com/query/latest' }] },
       { name: 'Storybook', path: '/frontend/storybook', file: './content/front-end/storybook-guide.md', officialDocs: [{ label: 'Storybook', url: 'https://storybook.js.org/docs' }] },
       { name: 'Jest & React Testing Library', path: '/frontend/jest-react-testing-library', file: './content/front-end/jest-react-testing-library-guide.md', officialDocs: [{ label: 'Jest', url: 'https://jestjs.io/docs/getting-started' }, { label: 'Testing Library', url: 'https://testing-library.com/docs/react-testing-library/intro' }] },
+      { name: 'Frontend Tooling', path: '/frontend/tooling', file: './content/front-end/frontend-tooling-guide.md', officialDocs: [{ label: 'Webpack', url: 'https://webpack.js.org/concepts' }, { label: 'Vite', url: 'https://vitejs.dev/guide' }, { label: 'npm Docs', url: 'https://docs.npmjs.com' }] },
       { name: 'React Comparisons', path: '/frontend/comparisons', file: './content/front-end/react-comparisons.md', officialDocs: [] },
     ]
   },
