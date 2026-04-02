@@ -1,277 +1,277 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://sreen98.github.io/interview-prep/</loc>
+    <loc>https://sreen98.github.io/prephub/</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/quiz</loc>
+    <loc>https://sreen98.github.io/prephub/quiz</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/playground</loc>
+    <loc>https://sreen98.github.io/prephub/playground</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/interview</loc>
+    <loc>https://sreen98.github.io/prephub/interview</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/review</loc>
+    <loc>https://sreen98.github.io/prephub/review</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/bookmarks</loc>
+    <loc>https://sreen98.github.io/prephub/bookmarks</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/cheatsheets</loc>
+    <loc>https://sreen98.github.io/prephub/cheatsheets</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/changelog</loc>
+    <loc>https://sreen98.github.io/prephub/changelog</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/frontend/react</loc>
+    <loc>https://sreen98.github.io/prephub/frontend/react</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/frontend/redux-toolkit</loc>
+    <loc>https://sreen98.github.io/prephub/frontend/redux-toolkit</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/frontend/redux-saga</loc>
+    <loc>https://sreen98.github.io/prephub/frontend/redux-saga</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/frontend/tanstack-query</loc>
+    <loc>https://sreen98.github.io/prephub/frontend/tanstack-query</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/frontend/storybook</loc>
+    <loc>https://sreen98.github.io/prephub/frontend/storybook</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/frontend/jest-react-testing-library</loc>
+    <loc>https://sreen98.github.io/prephub/frontend/jest-react-testing-library</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/frontend/tooling</loc>
+    <loc>https://sreen98.github.io/prephub/frontend/tooling</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/frontend/comparisons</loc>
+    <loc>https://sreen98.github.io/prephub/frontend/comparisons</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/javascript/guide</loc>
+    <loc>https://sreen98.github.io/prephub/javascript/guide</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/javascript/typescript</loc>
+    <loc>https://sreen98.github.io/prephub/javascript/typescript</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/javascript/comparisons</loc>
+    <loc>https://sreen98.github.io/prephub/javascript/comparisons</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/backend/nodejs</loc>
+    <loc>https://sreen98.github.io/prephub/backend/nodejs</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/backend/expressjs</loc>
+    <loc>https://sreen98.github.io/prephub/backend/expressjs</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/backend/mongodb</loc>
+    <loc>https://sreen98.github.io/prephub/backend/mongodb</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/backend/api-design</loc>
+    <loc>https://sreen98.github.io/prephub/backend/api-design</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/backend/database-schema</loc>
+    <loc>https://sreen98.github.io/prephub/backend/database-schema</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/backend/cors</loc>
+    <loc>https://sreen98.github.io/prephub/backend/cors</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/backend/comparisons</loc>
+    <loc>https://sreen98.github.io/prephub/backend/comparisons</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/aws/iam</loc>
+    <loc>https://sreen98.github.io/prephub/aws/iam</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/aws/ec2</loc>
+    <loc>https://sreen98.github.io/prephub/aws/ec2</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/aws/s3</loc>
+    <loc>https://sreen98.github.io/prephub/aws/s3</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/aws/lambda</loc>
+    <loc>https://sreen98.github.io/prephub/aws/lambda</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/aws/cloudwatch</loc>
+    <loc>https://sreen98.github.io/prephub/aws/cloudwatch</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/aws/frontend-deployment</loc>
+    <loc>https://sreen98.github.io/prephub/aws/frontend-deployment</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/aws/comparisons</loc>
+    <loc>https://sreen98.github.io/prephub/aws/comparisons</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/git/guide</loc>
+    <loc>https://sreen98.github.io/prephub/git/guide</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/git/comparisons</loc>
+    <loc>https://sreen98.github.io/prephub/git/comparisons</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/dsa/guide</loc>
+    <loc>https://sreen98.github.io/prephub/dsa/guide</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/behavioral/guide</loc>
+    <loc>https://sreen98.github.io/prephub/behavioral/guide</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/system-design/guide</loc>
+    <loc>https://sreen98.github.io/prephub/system-design/guide</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/system-design/comparisons</loc>
+    <loc>https://sreen98.github.io/prephub/system-design/comparisons</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/cheatsheets/react-hooks</loc>
+    <loc>https://sreen98.github.io/prephub/cheatsheets/react-hooks</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/cheatsheets/javascript-es6</loc>
+    <loc>https://sreen98.github.io/prephub/cheatsheets/javascript-es6</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/cheatsheets/git-commands</loc>
+    <loc>https://sreen98.github.io/prephub/cheatsheets/git-commands</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/cheatsheets/git-workflows</loc>
+    <loc>https://sreen98.github.io/prephub/cheatsheets/git-workflows</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/cheatsheets/big-o-notation</loc>
+    <loc>https://sreen98.github.io/prephub/cheatsheets/big-o-notation</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/cheatsheets/css-flexbox-grid</loc>
+    <loc>https://sreen98.github.io/prephub/cheatsheets/css-flexbox-grid</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sreen98.github.io/interview-prep/cheatsheets/http-status-codes</loc>
+    <loc>https://sreen98.github.io/prephub/cheatsheets/http-status-codes</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
