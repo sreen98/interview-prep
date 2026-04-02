@@ -2,7 +2,7 @@
 
 A comprehensive, modern web app for full-stack developer interview preparation. Built with React 19, deployed on GitHub Pages as a PWA.
 
-**Live site: [sreen98.github.io/interview-prep](https://sreen98.github.io/interview-prep/)**
+**Live site: [sreen98.github.io/prephub](https://sreen98.github.io/prephub/)**
 
 ## Features
 
@@ -52,7 +52,7 @@ A comprehensive, modern web app for full-stack developer interview preparation. 
 ## Project Structure
 
 ```
-interview-prep/
+prephub/
   src/
     App.tsx                    # Main app: layout, sidebar, routes, ContentPage, HomePage
     data.ts                    # menuStructure, contentFiles, utilities, cheatSheets

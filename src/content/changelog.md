@@ -1,6 +1,12 @@
 # What's New
 
-## Latest (April 2026)
+## v1.0.0 (April 2026)
+
+### Repo Renamed to PrepHub
+
+- Repository renamed from `interview-prep` to `prephub`
+- Live site URL is now **sreen98.github.io/prephub**
+- Started semantic versioning at v1.0.0
 
 ### New Content: CORS Guide
 

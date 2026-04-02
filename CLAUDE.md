@@ -56,7 +56,7 @@ All persistence is in localStorage. Key schemas are documented in README.md. Imp
 - Don't add new dependencies without considering bundle size. Lazy-load heavy libs (mermaid, babel) via dynamic `import()`.
 
 ### Deployment
-- Base path is `/interview-prep/` (configured in `vite.config.js` and BrowserRouter basename).
+- Base path is `/prephub/` (configured in `vite.config.js` and BrowserRouter basename).
 - PWA configured via `vite-plugin-pwa` with `autoUpdate` registration.
 - Icons in `public/` (pwa-192x192.png, pwa-512x512.png).
 
@@ -74,7 +74,12 @@ There are no automated tests. Verify changes by:
 2. **`README.md`** — Update if the change is user-facing (new features, new guides, updated counts, tech stack changes, project structure, dev commands).
 3. **`src/content/changelog.md`** — Update if the change is something the end user should see (new content, new features, UI changes, bug fixes). This powers the in-app "What's New" modal.
 
+## Versioning
+- Uses semantic versioning. Current version is in `package.json`.
+- Version `1.0.0` marks the first stable release with the repo rename to `prephub`.
+
 ## What's New (Latest Changes)
+- **v1.0.0** — Repo renamed from `interview-prep` to `prephub`. Base path updated to `/prephub/` across all configs.
 - **CORS guide** — New Back End guide covering Same-Origin Policy, CORS headers, preflight, credentialed requests, Express.js configuration, debugging, and 15 interview Q&A
 - **Flattened repo structure** — Moved app from `web/` subfolder to root. All configs, `src/`, `scripts/`, `public/` now live at the repo root.
 - **Frontend Tooling guide** — New Front End guide covering Webpack, Vite, npm/yarn/pnpm, bundler comparisons, package.json, npx, and 20 interview Q&A

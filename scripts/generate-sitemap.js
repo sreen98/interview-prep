@@ -7,7 +7,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SITE_URL = 'https://sreen98.github.io/interview-prep';
+const SITE_URL = 'https://sreen98.github.io/prephub';
 const DIST_DIR = path.resolve(__dirname, '../dist');
 
 // Static routes

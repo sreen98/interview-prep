@@ -16,8 +16,8 @@ export default defineConfig({
         theme_color: '#6366f1',
         background_color: '#0a0a0f',
         display: 'standalone',
-        scope: '/interview-prep/',
-        start_url: '/interview-prep/',
+        scope: '/prephub/',
+        start_url: '/prephub/',
         icons: [
           {
             src: 'pwa-192x192.png',
@@ -58,5 +58,5 @@ export default defineConfig({
       },
     }),
   ],
-  base: '/interview-prep/',
+  base: '/prephub/',
 })
