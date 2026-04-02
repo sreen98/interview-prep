@@ -36,7 +36,11 @@
       "Bash(cp web/index.html .)",
       "Bash(cp web/package.json .)",
       "Bash(rm:*)",
-      "Bash(grep -v -E '^\\(node_modules|dist|\\\\.git\\)$')"
+      "Bash(grep -v -E '^\\(node_modules|dist|\\\\.git\\)$')",
+      "Bash(qlmanage -t -s 1200 -o . og-image.svg)",
+      "Bash(mv og-image.svg.png og-image.png)",
+      "Bash(sips -g pixelWidth -g pixelHeight og-image.png)",
+      "Bash(sips --cropToHeightWidth 630 1200 og-image.png)"
     ]
   }
 }

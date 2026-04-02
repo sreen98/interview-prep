@@ -8,6 +8,13 @@
 - Live site URL is now **sreen98.github.io/prephub**
 - Started semantic versioning at v1.0.0
 
+### Production Polish
+
+- Custom **Open Graph image** (1200x630) for better social media previews
+- **DNS prefetch** for Google Analytics for faster page loads
+- **PWA screenshots** and categories in manifest for richer install prompts
+- Fixed `robots.txt` sitemap URL to point to new repo name
+
 ### New Content: CORS Guide
 
 - Comprehensive guide covering **Same-Origin Policy, CORS headers, preflight requests, credentialed requests**, and security best practices

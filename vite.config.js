@@ -31,6 +31,23 @@ export default defineConfig({
             purpose: 'any maskable',
           },
         ],
+        screenshots: [
+          {
+            src: 'screenshots/desktop.png',
+            sizes: '1280x720',
+            type: 'image/png',
+            form_factor: 'wide',
+            label: 'PrepHub desktop view with study guides and sidebar navigation',
+          },
+          {
+            src: 'screenshots/mobile.png',
+            sizes: '390x844',
+            type: 'image/png',
+            form_factor: 'narrow',
+            label: 'PrepHub mobile view with interview prep content',
+          },
+        ],
+        categories: ['education', 'productivity'],
       },
       workbox: {
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
