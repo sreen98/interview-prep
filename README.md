@@ -7,7 +7,7 @@ A comprehensive, modern web app for full-stack developer interview preparation. 
 ## Features
 
 ### Study Content
-- **20+ Guides** across 8 categories: Front End (React, Redux, TanStack Query, Storybook, Testing, Frontend Tooling), JS & TS, Back End (Node.js, Express, MongoDB, API Design, CORS, Database Schema), AWS, Git, DSA, Behavioral, System Design
+- **20+ Guides** across 8 categories: Front End (React, React Native & Apps, Redux, TanStack Query, Storybook, Testing, Frontend Tooling), JS & TS, Back End (Node.js, Express, MongoDB, API Design, CORS, Database Schema), AWS, Git, DSA, Behavioral, System Design
 - **7 Cheat Sheets** — condensed quick reference cards (React Hooks, JS ES6+, Git Commands, Git Workflows, Big-O, CSS Flexbox/Grid, HTTP Status Codes)
 - **Mermaid Diagrams** — architecture diagrams rendered as interactive visuals
 - **Tricky Output Questions** — "Guess the Output" sections in 7 guides (React, TypeScript, Node.js, Redux Saga, Express, MongoDB, Redux Toolkit) with 84 total questions and cheat sheets
@@ -79,7 +79,7 @@ prephub/
       useStudyStats.ts         # Streak & gamification stats (localStorage)
       useTextToSpeech.ts       # Web Speech API wrapper
     content/
-      front-end/               # React, Redux, TanStack Query, Storybook, Testing, Frontend Tooling guides
+      front-end/               # React, React Native & Apps, Redux, TanStack Query, Storybook, Testing, Frontend Tooling guides
       javascript-and-typescript/
       back-end/                # Node.js, Express, MongoDB, API Design, CORS, Database Schema guides
       aws/                     # IAM, EC2, S3, Lambda, CloudWatch guides

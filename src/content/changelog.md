@@ -1,5 +1,29 @@
 # What's New
 
+## v1.0.3 (April 2026)
+
+### New Content: React Native & Mobile Apps Guide
+
+A full guide to building native mobile apps with React Native, added to the Front End section:
+
+- **Core mobile concepts** — React Native vs hybrid/Flutter/native, JS thread vs UI thread, how the platform bridge works
+- **Expo vs bare CLI** — when to use each, EAS Build, Expo Prebuild, `app.json` config
+- **Core components** — `View`, `Text`, `Image`, `ScrollView`, `TextInput`, `Pressable`, `Modal`
+- **Styling & Flexbox** — `StyleSheet`, platform differences from web (column default, no cascade, dp units, shadows)
+- **Lists** — `FlatList`/`SectionList` performance (`getItemLayout`, `windowSize`, memoized `renderItem`), FlashList
+- **Navigation** — React Navigation (Stack, Tab, Drawer), typed params, Expo Router file-based routing
+- **Platform APIs** — `Platform`, `Dimensions`, `StatusBar`, `SafeAreaView`, `KeyboardAvoidingView`, `BackHandler`, `Linking`
+- **Storage** — AsyncStorage, MMKV, SecureStore, SQLite, Realm, WatermelonDB — when to pick which
+- **Animations & gestures** — `Animated` API + `useNativeDriver`, Reanimated worklets, `react-native-gesture-handler`
+- **Native modules & New Architecture** — JSI, Fabric, TurboModules, Hermes, Bridgeless mode
+- **Permissions, push notifications, deep linking** (URL schemes, Universal Links, App Links)
+- **Build & release** — EAS Build, signing, App Store / Play Store, EAS Update / CodePush OTA
+- **Accessibility, i18n & RTL, offline patterns**
+- **30 interview questions** across beginner / intermediate / advanced
+- **16 tricky questions** — `flex: 1` gotchas, `flexDirection` default, `useNativeDriver` limitations, stale `setState` in intervals, Android shadows, `SafeAreaView` platform differences, AsyncStorage startup flash, and more
+
+---
+
 ## v1.0.2 (April 2026)
 
 ### Tricky Output Questions — 7 Guides

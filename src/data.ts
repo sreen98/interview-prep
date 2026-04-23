@@ -65,9 +65,10 @@ export const menuStructure: MenuSection[] = [
     lightBg: 'bg-blue-50',
     darkBg: 'dark:bg-blue-950/30',
     accent: 'text-blue-600 dark:text-blue-400',
-    description: 'React, Redux, TanStack Query & Storybook',
+    description: 'React, React Native, Redux, TanStack Query & Storybook',
     items: [
       { name: 'React Guide', path: '/frontend/react', file: './content/front-end/react-guide.md', officialDocs: [{ label: 'React', url: 'https://react.dev' }] },
+      { name: 'React Native & Apps', path: '/frontend/react-native', file: './content/front-end/react-native-guide.md', officialDocs: [{ label: 'React Native', url: 'https://reactnative.dev' }, { label: 'Expo', url: 'https://docs.expo.dev' }, { label: 'React Navigation', url: 'https://reactnavigation.org' }] },
       { name: 'Redux Toolkit', path: '/frontend/redux-toolkit', file: './content/front-end/redux-toolkit-guide.md', officialDocs: [{ label: 'Redux Toolkit', url: 'https://redux-toolkit.js.org' }] },
       { name: 'Redux Saga', path: '/frontend/redux-saga', file: './content/front-end/redux-saga-guide.md', officialDocs: [{ label: 'Redux-Saga', url: 'https://redux-saga.js.org' }] },
       { name: 'TanStack Query', path: '/frontend/tanstack-query', file: './content/front-end/tanstack-query-guide.md', officialDocs: [{ label: 'TanStack Query', url: 'https://tanstack.com/query/latest' }] },

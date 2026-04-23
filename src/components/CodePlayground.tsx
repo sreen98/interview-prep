@@ -2857,7 +2857,7 @@ export default function CodePlayground() {
           <h1 className="text-lg font-bold shrink-0 text-white">Playground</h1>
           {selectedName && (
             <span className="text-sm text-slate-500 font-normal truncate hidden sm:inline">
-              \u2014 {selectedName}
+              — {selectedName}
             </span>
           )}
           {isJSX && (
@@ -2889,7 +2889,7 @@ export default function CodePlayground() {
           >
             {isRunning ? <Loader2 size={14} className="animate-spin" /> : <Play size={14} />}
             {isRunning ? 'Running...' : 'Run'}
-            <kbd className="hidden sm:inline text-[10px] opacity-70 ml-1">\u2318\u21B5</kbd>
+            <kbd className="hidden sm:inline text-[10px] opacity-70 ml-1">⌘↵</kbd>
           </button>
         </div>
       </div>
@@ -2927,7 +2927,7 @@ export default function CodePlayground() {
           <div className={`overflow-auto p-4 bg-[#1e1e2e] font-mono text-sm ${hasPreview ? 'max-h-[30vh]' : 'flex-1 min-h-[100px]'}`}>
             {output.length === 0 && !hasPreview ? (
               <div className="text-slate-500 italic">
-                Click "Run" or press \u2318+Enter to execute your code...
+                Click "Run" or press ⌘+Enter to execute your code...
               </div>
             ) : (
               output.map((entry: OutputEntry, i: number) => (
