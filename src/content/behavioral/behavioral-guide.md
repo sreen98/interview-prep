@@ -8,21 +8,33 @@ A comprehensive guide to mastering behavioral interviews. This is not about algo
 
 1. [Why Behavioral Interviews Matter](#1-why-behavioral-interviews-matter)
 2. [The STAR Method](#2-the-star-method)
-3. ["Tell Me About Yourself"](#3-tell-me-about-yourself)
-4. [Top 20 Behavioral Questions with STAR Examples](#4-top-20-behavioral-questions-with-star-examples)
-5. [Amazon Leadership Principles](#5-amazon-leadership-principles)
-6. [Common Follow-Up Questions](#6-common-follow-up-questions)
-7. [Questions to Ask the Interviewer](#7-questions-to-ask-the-interviewer)
-8. [Body Language & Communication Tips](#8-body-language--communication-tips)
-9. [Preparation Checklist](#9-preparation-checklist)
-10. [Interview Questions & Answers](#10-interview-questions--answers)
-11. [References](#11-references)
+3. [Alternative Frameworks Beyond STAR](#3-alternative-frameworks-beyond-star)
+4. ["Tell Me About Yourself"](#4-tell-me-about-yourself)
+5. [Top 20 Behavioral Questions with STAR Examples](#5-top-20-behavioral-questions-with-star-examples)
+6. [Amazon Leadership Principles](#6-amazon-leadership-principles)
+7. [Company-Specific Behavioral Cultures](#7-company-specific-behavioral-cultures)
+8. [Common Follow-Up Questions](#8-common-follow-up-questions)
+9. [Handling Tough Questions](#9-handling-tough-questions)
+10. [Salary Negotiation](#10-salary-negotiation)
+11. [Questions to Ask the Interviewer](#11-questions-to-ask-the-interviewer)
+12. [Body Language & Communication Tips](#12-body-language--communication-tips)
+13. [Preparation Checklist](#13-preparation-checklist)
+14. [Interview Questions & Answers](#14-interview-questions--answers)
+15. [References](#15-references)
 
 ---
 
 ## 1. Why Behavioral Interviews Matter
 
-Behavioral interviews exist because **past behavior is the single best predictor of future behavior**. Companies use them to evaluate:
+Behavioral interviews exist because **past behavior is the single best predictor of future behavior**. This isn't an HR slogan — it's the underlying empirical claim from organizational psychology that justifies the entire format. The seminal work is Janz, Hellervik & Gilmore's *Behavior Description Interviewing* (1986), which showed that structured questions about specific past situations predict future job performance roughly **2–3x better** than unstructured interviews ("tell me about your strengths") and **5x better** than résumé screening alone. Google's internal Project Oxygen and Project Aristotle research confirmed the same pattern at scale: structured behavioral signals are the most reliable predictor of who succeeds at the company.
+
+The theory rests on three assumptions:
+
+1. **People act in patterns.** How you handled a tight deadline three years ago is a meaningful signal about how you'll handle one next quarter — *not* a perfect predictor, but the best one we have.
+2. **Hypothetical questions are noise.** "What *would* you do if a teammate disagreed with you?" gets you what the candidate *thinks they should say*, which is almost always different from what they'd actually do. Past-tense forces concreteness.
+3. **Specificity beats abstractions.** "I'm a great communicator" is unverifiable. "Last quarter I gave a tech talk that the team adopted as our deployment standard" is checkable, dated, and consequential.
+
+Companies use them to evaluate:
 
 - **Culture fit** — Will you thrive in our environment?
 - **Collaboration skills** — Can you work effectively with others?
@@ -124,7 +136,78 @@ Share the outcome. Quantify the impact wherever possible.
 
 ---
 
-## 3. "Tell Me About Yourself"
+## 3. Alternative Frameworks Beyond STAR
+
+STAR is dominant but not universal. Knowing one or two alternatives helps when STAR feels forced (some questions don't have a clean "Result"; some answers need more emphasis on reasoning than action). Pick the framework that fits the question, not the question that fits your framework.
+
+### 3.1 CAR (Context, Action, Result)
+
+A compressed version of STAR — the Situation and Task collapse into one "Context" beat. Useful when the situation is short and you want to spend more time on what you actually *did*.
+
+```
+Context  — 1 sentence: where, when, who.
+Action   — 4–6 sentences: specific things YOU did.
+Result   — 1–2 sentences: outcome with numbers.
+```
+
+Best for: senior+ candidates who can compress context efficiently, and for time-constrained interviews where 90-second STAR answers eat the clock.
+
+### 3.2 SOAR (Situation, Obstacle, Action, Result)
+
+STAR with the *obstacle* made explicit. Useful for "tell me about a challenge" questions where the difficulty itself is the heart of the answer.
+
+```
+Situation — context, brief.
+Obstacle  — what made this hard? Why was it not obvious?
+Action    — what you did, given the obstacle.
+Result    — outcome.
+```
+
+Best for: questions about ambiguity, conflict, blocked work, or "tell me about a hard problem." The Obstacle beat highlights judgment rather than just execution.
+
+### 3.3 PARLA (Problem, Action, Result, Learning, Application)
+
+The reflection-heavy framework. Adds two beats after Result that show self-awareness and growth — qualities Amazon's "Learn and Be Curious" and Google's "Googleyness" both probe for.
+
+```
+Problem     — what was the situation/challenge.
+Action      — what you did.
+Result      — outcome.
+Learning    — what you took away (positive or negative).
+Application — how that lesson changed your behavior since.
+```
+
+Best for: "Tell me about a failure," "What did you learn from a setback," or any question where the interviewer is explicitly probing growth mindset. The Learning + Application beats are what separate "I made a mistake" from "I made a mistake and I'm a better engineer because of it."
+
+### 3.4 BAR (Behavior, Action, Result)
+
+A variant common in tech interviews where the Behavior beat names the *trait* the story demonstrates — useful when the question is rubric-aligned ("Tell me about a time you showed ownership"). You're naming the trait you're about to demonstrate so the interviewer doesn't have to do the mapping.
+
+```
+Behavior  — "This is a story about ownership..."
+Action    — what you did that demonstrated it.
+Result    — outcome.
+```
+
+Best for: rubric-driven interviews (Amazon LP, Microsoft growth mindset, Google GCA) where the interviewer is grading against a specific signal.
+
+### 3.5 When to use which
+
+```
+| Question type                          | Best framework         |
+|----------------------------------------|------------------------|
+| Generic "tell me about a time..."      | STAR                   |
+| "Tell me about a hard challenge"       | SOAR                   |
+| "Tell me about a failure / setback"    | PARLA                  |
+| "Tell me about ownership / leadership" | BAR (or STAR + label)  |
+| Time-pressured screen / 30-min round   | CAR                    |
+```
+
+The key insight: **interviewers are not graded on which framework you used.** They're graded on whether they could extract a clean signal from your answer. Whichever framework helps you tell the *clearest* story for *that* question is the right one.
+
+---
+
+## 4. "Tell Me About Yourself"
 
 This is usually the first question. It is not an invitation to recite your resume. It is your chance to frame the narrative of your career.
 
@@ -170,7 +253,7 @@ Structure your answer in three parts:
 
 ---
 
-## 4. Top 20 Behavioral Questions with STAR Examples
+## 5. Top 20 Behavioral Questions with STAR Examples
 
 ### Teamwork & Collaboration
 
@@ -392,7 +475,7 @@ Structure your answer in three parts:
 
 ---
 
-## 5. Amazon Leadership Principles
+## 6. Amazon Leadership Principles
 
 Amazon's 16 Leadership Principles are used in every interview loop. Each interviewer is typically assigned 1-2 principles to probe. Prepare at least one STAR story for each.
 
@@ -428,7 +511,97 @@ Amazon's 16 Leadership Principles are used in every interview loop. Each intervi
 
 ---
 
-## 6. Common Follow-Up Questions
+## 7. Company-Specific Behavioral Cultures
+
+Different companies optimize for different behavioral signals. The same story that lands at Amazon may underperform at Google, not because the story is bad, but because the rubric is different. Here's how the major tech companies actually grade behavioral interviews.
+
+### 7.1 Amazon — Leadership Principles (covered in §6)
+
+Tightest rubric in the industry. 16 explicit principles, every interviewer assigned 1–2, every story graded against the assigned principle. The rubric is **public**, the bar is high, and every loop ends with a "bar raiser" — a senior employee outside your team whose job is to say no when the rest of the panel says yes.
+
+What makes Amazon distinct: **data obsession** ("how do you know? show me the metric"), **ownership** ("don't say 'we' — what did *you* do"), and **disagree-and-commit** (they want both halves: principled pushback and full execution after the call is made).
+
+### 7.2 Google — GCA, RRK, Leadership, Googleyness
+
+Google evaluates four signals across the loop:
+
+- **GCA (General Cognitive Ability)** — structured problem-solving on novel problems. "How would you approach X?" The signal is *thinking process*, not the answer.
+- **RRK (Role-Related Knowledge)** — domain depth. The technical interview is here.
+- **Leadership** — influence without authority, navigating ambiguity, mentoring.
+- **Googleyness** — comfort with ambiguity, intellectual humility, bias for action, collaboration. The most subjective signal; calibrated through the famous "hiring committee" review.
+
+Stories about **navigating ambiguity** ("the spec was unclear and I had to figure it out") and **intellectual humility** ("I was wrong; here's how I learned") land especially well. Avoid stories that frame you as the lone hero — Google grades on collaborative narratives.
+
+### 7.3 Meta (Facebook) — Move Fast, Be Bold, Focus on Impact
+
+Meta's rubric used to be summarized in five values: Move Fast, Be Bold, Focus on Impact, Be Open, Build Social Value. The behavioral interviews probe specifically for:
+
+- **Impact at scale** — "what did you ship and how many users felt it." Quantify ruthlessly.
+- **Bias for action** — "I shipped a v1 in a week, learned, iterated" beats "I designed the perfect system over a quarter."
+- **Disagreement** — Meta values direct, principled conflict. "I told my skip-level the project was misprioritized" is a positive signal, not a negative one.
+
+Avoid stories about meticulous up-front planning; Meta culture is "ship, measure, iterate."
+
+### 7.4 Microsoft — Growth Mindset
+
+Centered on Carol Dweck's growth-mindset framework (Microsoft adopted it under Satya Nadella). The interviewers probe for:
+
+- **Learning from failure** — "I screwed up and here's what I learned" is a strong signal, *not* a weakness.
+- **Curiosity over competence** — "I don't know, but here's how I'd find out" outperforms "I would do X" when you're guessing.
+- **Customer obsession** — same word as Amazon, similar weight.
+
+PARLA (§3.3) is the natural framework for Microsoft because the *Learning* and *Application* beats are exactly what they're grading.
+
+### 7.5 Apple — Direct, Detail-Oriented, Secrecy-Comfortable
+
+Apple's behavioral interviews are less rubric-driven than peers but probe for:
+
+- **Attention to detail** — sweat-the-details stories land.
+- **Disagreement on craft** — "I pushed back on the spec because the design was wrong" is the kind of story Apple wants.
+- **Comfort with secrecy** — comfortable working on something you can't talk about, comfortable with "need to know."
+- **Cross-functional collaboration** — engineers ↔ designers ↔ ops.
+
+Apple is known for fewer behavioral rounds but heavier scrutiny within them. Stories about insisting on quality despite pressure are core.
+
+### 7.6 Netflix — Freedom and Responsibility
+
+Netflix's culture deck (the famous "Netflix Culture Deck") is the rubric. The signals:
+
+- **High judgment without supervision** — "I made a major call without escalation; here's why and how it worked."
+- **Direct disagreement** — Netflix grades for "candor"; performative agreement is a red flag.
+- **Talent density / saying no** — comfortable raising the bar on hiring, comfortable letting go of underperformers.
+
+Netflix is known for the "keeper test" — "would you fight to keep this person?" Stories that show you raise the bar on the team, not just yourself, perform best.
+
+### 7.7 Startups (Series A–C)
+
+Different concerns:
+
+- **Wear many hats** — "I was the engineer + the designer + the ops person" is a positive signal, not a confession.
+- **Speed under uncertainty** — "we didn't have the data so I made a call and we iterated."
+- **Comfort with chaos** — "the priorities shifted weekly and here's how I adapted" is the trait they want.
+
+Avoid big-company stories about long process and meticulous planning; the startup will hear "this person needs scaffolding."
+
+### 7.8 Cross-company comparison
+
+```
+| Company   | Top signals graded                                          | Worst-fit story                          |
+|-----------|-------------------------------------------------------------|------------------------------------------|
+| Amazon    | Ownership, data, disagree-and-commit, customer obsession    | "We" stories with no clear personal arc  |
+| Google    | Ambiguity, humility, collaboration, structured thinking     | Lone-hero, "I single-handedly..."        |
+| Meta      | Impact at scale, bias for action, direct disagreement       | Quarter-long planning before shipping    |
+| Microsoft | Growth mindset, learning from failure, curiosity            | Stories with no failure or no learning   |
+| Apple     | Detail, craft, principled disagreement, secrecy comfort     | Move-fast-and-break-things stories       |
+| Netflix   | High judgment, direct candor, raising the bar on others     | Process-heavy, escalation-heavy stories  |
+| Startups  | Many hats, speed under chaos, comfort with ambiguity        | "I followed our 5-stage release process" |
+```
+
+Tailoring is real. The same engineer with the same career history can win at one company and miss at another based on which 3 stories they pick to tell.
+
+---
+
+## 8. Common Follow-Up Questions
 
 After you give your initial STAR answer, expect these probing questions. Prepare for them in advance.
 
@@ -474,7 +647,216 @@ After you give your initial STAR answer, expect these probing questions. Prepare
 
 ---
 
-## 7. Questions to Ask the Interviewer
+## 9. Handling Tough Questions
+
+The questions interviewers ask when they want to *check the seams*. These probe areas where candidates often lie, dodge, or get defensive — your job is to answer honestly without sabotaging yourself.
+
+### 9.1 "Why are you leaving your current job?"
+
+**The trap:** badmouthing your current employer. Even when the truth is "my manager is incompetent," saying it out loud signals you'll do the same about *this* company in two years.
+
+**The frame:** pull toward the future, not away from the past.
+
+> "I've grown a lot in my current role, and I've reached a point where the next set of challenges I want — \[scale / domain / leadership / specific tech\] — isn't on the roadmap there. \[Company\] is doing exactly that work, which is why I'm interested."
+
+What to avoid:
+- Salary as the only reason ("they don't pay enough") — implies you'll leave again as soon as someone outbids.
+- Manager bashing — even legitimate complaints sound like a red flag.
+- Vague "looking for a change" — sounds unconsidered.
+
+What lands:
+- A specific growth dimension you're optimizing for.
+- An honest acknowledgment of what your current job *is* good for, plus what it isn't.
+
+### 9.2 "Tell me about a weakness."
+
+**The trap:** the fake weakness. "I work too hard." "I'm too detail-oriented." Interviewers grade these as dishonesty signals.
+
+**The frame:** name a real, specific weakness — and pair it with what you do to mitigate it.
+
+> "I'm not naturally great at giving negative feedback in real time — my instinct is to soften it, and I've had cases where the message didn't land. What I do now is write the feedback down before the conversation, identify the one specific behavior I want to change, and lead with that. It's still not natural, but it's more effective."
+
+The structure:
+1. Real, specific weakness (not "perfectionism").
+2. Acknowledge a concrete cost it has caused.
+3. Describe an active mitigation — what you do about it now.
+4. Optional: brief evidence the mitigation works.
+
+Don't pick a weakness that disqualifies you for the role — "I'm not great at code reviews" is a problem for an engineering role; "I'm shy in large group brainstorms" is fine.
+
+### 9.3 "Why is there a gap in your résumé?"
+
+**The trap:** apologizing or being evasive. Either reads as shame.
+
+**The frame:** state the reason factually, then redirect to what you did with the time.
+
+> "I took six months off to care for my father after his stroke. During that time I shipped two side projects — one of which is open-source with about 200 GitHub stars — and finished a course in distributed systems. I'm fully back in the market."
+
+Reasons that need *no* apology:
+- Caregiving (parent, child, partner).
+- Health (yours or family's).
+- Layoff (extremely common; doesn't reflect on you).
+- Burnout, taken seriously and recovered from.
+- Relocation, immigration, parenting.
+
+The framing: you're not making excuses for the gap; you're explaining it factually, optionally noting any productive work, and signaling that you're ready now.
+
+### 9.4 "Tell me about a conflict with a coworker."
+
+**The trap:** picking a story where you were objectively right and they were objectively wrong. Interviewers don't believe these stories — and even if they did, "I was right" is a less interesting signal than "we found a path forward."
+
+**The frame:** pick a story with two reasonable people who disagreed in good faith. Show how you handled the disagreement, not how you "won."
+
+> "A senior peer and I disagreed on whether to migrate our service to gRPC. He thought the latency win was worth the migration cost; I thought we should invest in caching the existing REST endpoints instead. I scheduled a 1:1 to understand his reasoning end-to-end, then we ran a 2-week spike to test both approaches with real traffic. The data showed his approach won on the high-traffic endpoints; mine won on the long-tail ones. We ended up with a hybrid plan, and the working relationship was *stronger* afterward because we'd disagreed productively."
+
+What lands:
+- Genuine respect for the other person's view.
+- Some mechanism for resolution (data, escalation, a third opinion).
+- Acknowledgment of what *they* were right about.
+- A relationship outcome, not just a technical one.
+
+### 9.5 "Tell me about a failure."
+
+**The trap:** picking a "failure" that's secretly a humblebrag ("I shipped too fast and we had to scale up the servers"). Interviewers see through these.
+
+**The frame:** PARLA (§3.3) — pick a real failure with real cost, then heavy-weight the *Learning* and *Application* beats.
+
+> "Two years ago I rolled out a database migration in production without a backup plan. The migration deadlocked under load and we had a 40-minute outage. I was on point and I should have caught it — I'd skipped the staging-load step because the change 'looked safe.'
+>
+> What I learned: there is no such thing as a 'looks safe' migration in a production database. What I changed: I now write a rollback step *before* writing the migration, and I won't approve a migration PR that doesn't include the rollback. We've shipped 30+ migrations under that rule with zero incidents. It also became our team's standard."
+
+Real failure (real cost), honest ownership (no blame deflection), specific learning (not "I learned to be careful"), measurable application (the new rule and its results).
+
+### 9.6 "What are your salary expectations?" (early-round)
+
+This is often asked too early — before they've decided whether to make an offer. Answering with a number locks you in *below* what they might have offered.
+
+**The frame:** defer the number until after the offer.
+
+> "I'd like to understand the role and the team better before I land on a number. I'm confident we can find a range that works for both of us once I've gone through the rest of the loop and you've decided I'm a fit."
+
+If pressed, give a wide range based on market data (Levels.fyi for the company + level), framed as a range you'd consider:
+
+> "Based on my research, total comp at this level at this company seems to range \[X to Y\]. I'd want to discuss the specifics — base, equity, signing — once we've had the offer conversation."
+
+### 9.7 "What's your current salary?" / "What do you make now?"
+
+In many U.S. states this is **illegal to ask** (CA, NY, IL, MA, WA, etc.). Even where it's legal, you don't have to answer — and it anchors the conversation against you.
+
+**The frame:** pivot to expectations.
+
+> "I prefer to focus on what I'm looking for in this role rather than what I made before. Based on the level and the role, I'd be looking for \[range\]."
+
+Don't lie about your current salary — but you don't have to disclose it either.
+
+### 9.8 "Where do you see yourself in 5 years?"
+
+**The trap:** answers that misalign with what the role offers. "I want to start my own company" tells them you'll leave; "I want to be a CTO" at a large company is unrealistic and possibly read as arrogant.
+
+**The frame:** name a *direction* (skill growth, scope, impact), not a specific title. Tie it to the role.
+
+> "In 5 years I want to be the engineer my team turns to for hard distributed-systems problems, mentoring junior engineers and driving the technical direction of a meaningful product area. The path through this role — \[specific scope mentioned by the JD\] — is exactly that direction, which is why I'm here."
+
+---
+
+## 10. Salary Negotiation
+
+The single highest-leverage conversation of your career happens in the 30 minutes after the offer call. Most engineers under-negotiate because they're afraid of "blowing it." Recruiters expect you to negotiate; not negotiating is rarely how you get the best offer.
+
+### 10.1 The market data
+
+Before any negotiation, know the market for your level at this company:
+
+- **Levels.fyi** — crowdsourced compensation data by company, level, location.
+- **Glassdoor / Comparably** — broader but less precise.
+- **Blind** — anonymous community discussions; useful for negotiation tactics specific to companies.
+- **Personal network** — engineers at the company at your target level. The most reliable data.
+
+Know three numbers for your level:
+- **P50** — the median offer.
+- **P75** — strong but achievable.
+- **P90** — top-of-band; achievable with strong performance/competing offers.
+
+### 10.2 The negotiation timeline
+
+```
+1. Recruiter screen          → DON'T anchor; defer salary discussion (see §9.6).
+2. Interviews                → focus on signal; salary not yet on the table.
+3. Verbal offer              → DON'T accept. Thank them; ask for written details + 24–48h.
+4. Written offer arrives     → analyze components; identify biggest gap to target.
+5. Counter-offer             → present a specific number with justification.
+6. Recruiter response        → may be yes/partial/no; iterate 1–2 rounds.
+7. Final acceptance          → get final terms in writing BEFORE signing.
+```
+
+The verbal-offer step is the biggest mistake point. Recruiters often ask "does that work?" hoping for a yes that ends the negotiation. Always ask for the written offer and 1–2 days to review, even if the offer looks great. Once you've signed, leverage is gone.
+
+### 10.3 The components of total compensation
+
+Don't just negotiate base. Negotiate *total comp*, which usually breaks into:
+
+- **Base salary** — easiest to compare across offers; least flexible to negotiate at most companies.
+- **Signing bonus** — one-time; often the most flexible component (recruiter has more authority over it). Expires if you leave within ~12 months.
+- **Equity (RSUs, options)** — often the largest piece for FAANG offers. Usually 4-year vest with 1-year cliff. Variable depending on stock price for public companies; speculative for private.
+- **Annual / refresher equity** — separate from the initial grant; ongoing. Often missed in negotiations because it's not in the initial offer letter.
+- **Performance bonus** — usually a % of base; varies by performance rating.
+- **Relocation** — lump-sum or expense-reimbursement; often negotiable up.
+- **Benefits** — 401k match, health, PTO, parental leave, sabbatical, learning budget — rarely cash-equivalent in negotiation but real.
+
+### 10.4 The leverage you actually have
+
+Negotiation works because the recruiter has **room** in their hiring budget for the role. Your leverage comes from:
+
+1. **Competing offers** — the strongest leverage by far. Even a verbal offer from a comparable company shifts the conversation. Be specific: "I have an offer from \[Company\] for \[total comp\] that I need to respond to by \[date\]."
+2. **Your current comp** (if higher than the offer) — "I'd be taking a step back, which I can't do without a strong story for why."
+3. **Specific scope or skills you bring** — not generic "I'm a great engineer," but specific things you've shipped that map to their needs.
+4. **The opportunity cost of restarting the loop** — they've invested 5+ hours of senior engineer time in your interviews. Re-running the process is genuinely expensive for them.
+
+What is *not* leverage:
+- Your current salary, when it's *lower* than the offer.
+- Your interest in the company. Recruiters know you want the job; that's why you're here.
+- Your personal financial needs. Compensation is set by market, not need.
+
+### 10.5 The script
+
+```
+"Thank you for the offer — I'm excited about the role and the team. Before I accept,
+I'd like to discuss the compensation.
+
+Based on market data for this level at this company, plus a competing offer at
+[Company] of [total comp], I was hoping we could close the gap. Specifically:
+
+  - Base: would [target] be possible?
+  - Equity: I've seen the band go up to [target equity] for this level.
+  - Signing: [target signing] would help bridge the time before equity vests.
+
+I want to make this work. Can you go back to your team and see what's possible?"
+```
+
+Three key elements: (1) gratitude and intent to accept, (2) specific numbers with justification, (3) a clear question that invites the recruiter to come back with a counter. Don't say "I want X or I walk." Say "can we close this gap."
+
+### 10.6 Mistakes to avoid
+
+- **Negotiating before the written offer arrives.** Verbal offers are non-binding and can be rescinded.
+- **Disclosing your "minimum acceptable" number.** Once disclosed, that's what you'll get.
+- **Accepting on the call.** Always take 24–48 hours.
+- **Lying about competing offers.** If caught, the offer is rescinded. Even if not caught, it's a bad professional foundation.
+- **Negotiating only base.** Equity and signing are usually more flexible.
+- **Stopping after one round.** A 5–10% increase per round is normal; expect 2 rounds.
+- **Burning the relationship.** The same recruiter you negotiated with becomes your colleague day one. Stay warm and collaborative throughout.
+
+### 10.7 When NOT to negotiate
+
+- **The offer is already at the top of the band** and you've confirmed via market data. Pushing harder may produce nothing and signal entitlement.
+- **You're below market because of your level** and the company has explicit policies. (Some companies don't negotiate junior-level offers at all.)
+- **The role is at a startup with a stretched budget.** You may be able to negotiate equity but not cash.
+- **You actively don't want to compete.** "Take it or leave it" offers exist; if accepting is fine, accepting is fine.
+
+The default, however, is *negotiate*. The expected value of a 30-minute conversation is rarely less than $5–20K/year compounding for the duration of the role.
+
+---
+
+## 11. Questions to Ask the Interviewer
 
 Asking thoughtful questions demonstrates genuine interest and helps you evaluate whether the role is right for you. Prepare 3-5 questions and prioritize based on who you are talking to.
 
@@ -532,7 +914,7 @@ These questions impress because they are personal, specific, and show you are ev
 
 ---
 
-## 8. Body Language & Communication Tips
+## 12. Body Language & Communication Tips
 
 Behavioral interviews are as much about *how* you communicate as *what* you say.
 
@@ -577,7 +959,7 @@ Behavioral interviews are as much about *how* you communicate as *what* you say.
 
 ---
 
-## 9. Preparation Checklist
+## 13. Preparation Checklist
 
 ### How to Prepare 5-8 Stories That Cover Most Questions
 
@@ -675,7 +1057,7 @@ FOLLOW-UP PREP:
 
 ---
 
-## 10. Interview Questions & Answers
+## 14. Interview Questions & Answers
 
 These questions are about the behavioral interview process itself — understanding how to approach, structure, and succeed in behavioral interviews.
 
@@ -747,7 +1129,7 @@ These questions are about the behavioral interview process itself — understand
 
 ---
 
-## 11. References
+## 15. References
 
 ### Books
 

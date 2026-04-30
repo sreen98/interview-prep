@@ -65,7 +65,7 @@ export const menuStructure: MenuSection[] = [
     lightBg: 'bg-blue-50',
     darkBg: 'dark:bg-blue-950/30',
     accent: 'text-blue-600 dark:text-blue-400',
-    description: 'React, React Native, Redux, TanStack Query, Storybook & Browser APIs',
+    description: 'React, React Native, Redux, TanStack Query, Browser APIs, Design Patterns & Refactoring',
     items: [
       { name: 'React Guide', path: '/frontend/react', file: './content/front-end/react-guide.md', officialDocs: [{ label: 'React', url: 'https://react.dev' }] },
       { name: 'React Native & Apps', path: '/frontend/react-native', file: './content/front-end/react-native-guide.md', officialDocs: [{ label: 'React Native', url: 'https://reactnative.dev' }, { label: 'Expo', url: 'https://docs.expo.dev' }, { label: 'React Navigation', url: 'https://reactnavigation.org' }] },
@@ -77,6 +77,8 @@ export const menuStructure: MenuSection[] = [
       { name: 'Jest & React Testing Library', path: '/frontend/jest-react-testing-library', file: './content/front-end/jest-react-testing-library-guide.md', officialDocs: [{ label: 'Jest', url: 'https://jestjs.io/docs/getting-started' }, { label: 'Testing Library', url: 'https://testing-library.com/docs/react-testing-library/intro' }] },
       { name: 'Frontend Tooling', path: '/frontend/tooling', file: './content/front-end/frontend-tooling-guide.md', officialDocs: [{ label: 'Webpack', url: 'https://webpack.js.org/concepts' }, { label: 'Vite', url: 'https://vitejs.dev/guide' }, { label: 'npm Docs', url: 'https://docs.npmjs.com' }] },
       { name: 'Browser APIs', path: '/frontend/browser-apis', file: './content/front-end/browser-apis-guide.md', officialDocs: [{ label: 'MDN Web APIs', url: 'https://developer.mozilla.org/en-US/docs/Web/API' }, { label: 'web.dev', url: 'https://web.dev' }, { label: 'HTML Living Standard', url: 'https://html.spec.whatwg.org' }] },
+      { name: 'Design Patterns', path: '/frontend/design-patterns', file: './content/front-end/design-patterns-guide.md', officialDocs: [{ label: 'Refactoring.guru — Design Patterns', url: 'https://refactoring.guru/design-patterns' }, { label: 'Patterns.dev', url: 'https://www.patterns.dev' }] },
+      { name: 'Refactoring & Code Review', path: '/frontend/refactoring-code-review', file: './content/front-end/refactoring-code-review-guide.md', officialDocs: [{ label: 'Refactoring.guru', url: 'https://refactoring.guru/refactoring' }, { label: 'Google Engineering Practices', url: 'https://google.github.io/eng-practices/review/' }] },
       { name: 'React Comparisons', path: '/frontend/comparisons', file: './content/front-end/react-comparisons.md', officialDocs: [] },
     ]
   },
@@ -353,16 +355,3 @@ export const cheatSheets: CheatSheet[] = [
   { name: 'HTTP Status Codes', path: '/cheatsheets/http-status-codes', file: './content/cheatsheets/http-status-codes.md', color: 'rose', description: '2xx success, 4xx client errors, 5xx server errors, REST mapping' },
 ];
 
-// ==================== Text-to-Speech ====================
-
-export function extractProseText(markdown: string): string[] {
-  let text = markdown.replace(/```[\s\S]*?```/g, '');
-  text = text.replace(/^#{1,6}\s+/gm, '');
-  text = text.replace(/\*\*|__|~~|`/g, '');
-  text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
-  text = text.replace(/!\[.*?\]\(.*?\)/g, '');
-  text = text.replace(/^\|.*\|$/gm, '');
-  text = text.replace(/^[-*] /gm, '');
-  text = text.replace(/^\d+\. /gm, '');
-  return text.split(/\n\n+/).map(p => p.trim()).filter(p => p.length > 5);
-}

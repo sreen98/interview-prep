@@ -10,20 +10,19 @@ import {
   Copy, Check, ArrowUp, Play, Zap, Terminal, List,
   PanelLeftClose, PanelLeftOpen, ExternalLink, Type, Clock,
   Link2, Bookmark, BookmarkCheck, Flame, GraduationCap,
-  RotateCcw, FileText, Volume2, VolumeX, CheckCircle, Circle,
+  RotateCcw, FileText, CheckCircle, Circle,
   ScrollText
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDarkMode } from './hooks/useDarkMode';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { contentFiles, menuStructure, slugify, getTextContent, extractHeadings, escapeRegex, estimateReadingTime, cheatSheets, extractProseText, getAllQuestions } from './data';
+import { contentFiles, menuStructure, slugify, getTextContent, extractHeadings, escapeRegex, estimateReadingTime, cheatSheets, getAllQuestions } from './data';
 import { useReadingPrefs } from './hooks/useReadingPrefs';
 import { useProgress } from './hooks/useProgress';
 import { useBookmarks } from './hooks/useBookmarks';
 import { useSpacedRepetition } from './hooks/useSpacedRepetition';
 import { useStudyStats } from './hooks/useStudyStats';
-import { useTextToSpeech } from './hooks/useTextToSpeech';
 import QuizMode from './components/QuizMode';
 import CodePlayground from './components/CodePlayground';
 import MermaidBlock from './components/MermaidBlock';
@@ -33,7 +32,6 @@ import InterviewSimulator from './components/InterviewSimulator';
 import CheatSheetsIndex from './components/CheatSheetsIndex';
 import StreakCelebration from './components/StreakCelebration';
 import Toast from './components/Toast';
-import TTSControls from './components/TTSControls';
 
 const GithubIcon = ({ size = 16, ...props }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -681,8 +679,6 @@ const ContentPage = ({ filePath, guidePath, guideName }) => {
   const { getStatus, markInProgress, toggleComplete } = useProgress();
   const { isBookmarked, toggleBookmark } = useBookmarks();
   const { recordGuideCompleted } = useStudyStats();
-  const tts = useTextToSpeech();
-  const proseParagraphs = useMemo(() => extractProseText(content), [content]);
   const guideStatus = guidePath ? getStatus(guidePath) : null;
 
   // Dynamic page title for SEO
@@ -733,19 +729,6 @@ const ContentPage = ({ filePath, guidePath, guideName }) => {
   useEffect(() => {
     if (guidePath) markInProgress(guidePath);
   }, [guidePath, markInProgress]);
-
-  // TTS paragraph highlighting
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const paragraphs = containerRef.current.querySelectorAll('p');
-    paragraphs.forEach(p => p.classList.remove('tts-speaking'));
-    if (tts.currentIndex >= 0 && tts.currentIndex < paragraphs.length) {
-      paragraphs[tts.currentIndex]?.classList.add('tts-speaking');
-    }
-  }, [tts.currentIndex]);
-
-  // Stop TTS on navigation
-  useEffect(() => { tts.stop(); }, [filePath]);
 
   const handleToggleComplete = () => {
     if (guidePath) {
@@ -884,24 +867,6 @@ const ContentPage = ({ filePath, guidePath, guideName }) => {
               {guideStatus === 'completed' ? <CheckCircle size={13} /> : <Circle size={13} />}
               {guideStatus === 'completed' ? 'Completed' : 'Mark Complete'}
             </button>
-          )}
-          <button
-            onClick={() => tts.isPlaying ? tts.stop() : tts.speak(proseParagraphs)}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
-          >
-            {tts.isPlaying ? <VolumeX size={13} /> : <Volume2 size={13} />}
-            {tts.isPlaying ? 'Stop' : 'Read Aloud'}
-          </button>
-          {tts.isPlaying && (
-            <TTSControls
-              isPlaying={tts.isPlaying}
-              isPaused={tts.isPaused}
-              rate={tts.rate}
-              onPause={tts.pause}
-              onResume={tts.resume}
-              onStop={tts.stop}
-              onSetRate={tts.setRate}
-            />
           )}
         </div>
 

@@ -32,10 +32,18 @@
   - [13.11 Tree Shaking and Code Splitting](#1311-tree-shaking-and-code-splitting-at-build-time)
   - [13.12 Server Components, SSR, Streaming](#1312-server-components-ssr-and-streaming)
   - [13.13 Performance Rules](#1313-performance-rules)
-- [14. Patterns and Best Practices](#14-patterns-and-best-practices)
-- [15. React 19 Features](#15-react-19-features)
-- [16. Interview Questions & Answers](#16-interview-questions--answers)
-- [17. Tricky Output Questions](#17-tricky-output-questions)
+- [14. Reconciliation and Fiber](#14-reconciliation-and-fiber)
+  - [14.1 Render → Reconcile → Commit](#141-the-render--reconcile--commit-pipeline)
+  - [14.2 Diffing algorithm — three rules](#142-the-diffing-algorithm--three-rules)
+  - [14.3 Type matching — re-render vs remount](#143-type-matching--when-components-survive-props-changes-vs-get-destroyed)
+  - [14.4 Why list keys matter](#144-why-list-keys-matter-at-the-algorithm-level)
+  - [14.5 Fiber data structure](#145-fiber--the-data-structure-that-makes-interruption-possible)
+  - [14.6 The work loop](#146-the-work-loop--how-react-actually-traverses)
+  - [14.7 Practical implications](#147-practical-implications)
+- [15. Patterns and Best Practices](#15-patterns-and-best-practices)
+- [16. React 19 Features](#16-react-19-features)
+- [17. Interview Questions & Answers](#17-interview-questions--answers)
+- [18. Tricky Output Questions](#18-tricky-output-questions)
 
 ---
 
@@ -1090,6 +1098,34 @@ function App() {
 
 For rendering thousands of items, virtualization renders only the visible items in the viewport. This prevents DOM bloat and keeps scrolling smooth.
 
+**The math.** A virtualizer maintains three numbers — the total list height (sum of every item's height), the current scroll offset, and the visible window height. From those it computes a `[startIndex, endIndex]` range — the items that intersect the viewport — plus an "overscan" buffer (typically 3–5 items) above and below to mask scroll latency. Only items in that range get React elements; everything else is a phantom that contributes its height to the scroll surface but renders nothing.
+
+The DOM trick is two layers: an outer scroll container with the **full virtual height** (so the scrollbar is correctly sized — `5000 items × 50px = 250000px`), and inner items absolutely positioned at `top = item.start`. Scrolling is just CSS — no React work. As the user scrolls, the virtualizer recomputes the visible range and React re-renders only the small set of visible items.
+
+**Fixed-height vs dynamic-height.**
+
+- **Fixed-height** (`react-window`'s `FixedSizeList`, `@tanstack/react-virtual` with `estimateSize: () => 50`) — easiest case. `start = index × itemHeight`, `endIndex = (scrollTop + viewportHeight) / itemHeight`. O(1) range computation; perfect scrollbar accuracy.
+- **Dynamic-height** (`VariableSizeList`, the default behavior of `@tanstack/react-virtual` with measured items) — you give an *estimate*, the virtualizer measures real heights as items render, and corrects the offsets. Two complications: (1) the scroll surface height is a sum based on estimates until items have been measured, so the scrollbar can subtly grow as the user scrolls past unmeasured items; (2) jumping to `index = 9000` with no measurements is a guess. Tools cache measurements between renders to keep things stable.
+
+**Library landscape.**
+
+```
+| Library                    | Size    | API style    | Strengths                              |
+|----------------------------|---------|--------------|----------------------------------------|
+| react-window               | ~5 KB   | Component    | Smallest, predictable, fixed/variable  |
+| @tanstack/react-virtual    | ~5 KB   | Hook (headless)| Most flexible; works in any container|
+| react-virtualized          | ~34 KB  | Component    | Most features (CellMeasurer, AutoSizer)|
+| react-virtuoso             | ~30 KB  | Component    | Best dynamic-height + grouped lists    |
+```
+
+**Gotchas:**
+
+- **`overscan` matters.** Too small → flicker as you scroll fast. Too large → wasted DOM. Start at 5; tune by feel.
+- **`key` must be stable.** If you key by index, scroll-into-view + delete causes content to "stick" to the wrong row.
+- **Search/jump-to-item** needs the virtualizer's `scrollToIndex(i)` API; setting `scrollTop` directly skips the measurement cache.
+- **Infinite scroll** combines virtualization with a fetch-trigger near the end of the rendered window — `react-window-infinite-loader` or `@tanstack/react-virtual` + an `IntersectionObserver` on a sentinel.
+- **CSS `content-visibility: auto`** is the platform-native alternative — the browser skips layout/paint for offscreen elements you've hinted are out of view. Lighter than DOM virtualization for some cases, but doesn't reduce React's render cost (it still renders all elements).
+
 ```tsx
 import { useVirtualizer } from '@tanstack/react-virtual';
 
@@ -1140,6 +1176,30 @@ React 18's concurrent renderer lets you mark some updates as **non-urgent** so t
 Higher-priority lanes can preempt lower ones. If the user types again while React is mid-transition, React **discards the in-progress render** and starts over with the latest state — the partially-rendered output is thrown away. This is why concurrent features don't make the work itself faster; they make it *interruptible*, so the urgent work (input value, paint) is never starved.
 
 **What `isPending` is actually telling you.** It is `true` from the moment `startTransition` queues the work to the moment that work commits. It lives in the urgent lane (so updating it doesn't block the input), and it lets you show a spinner without re-introducing the lag — the spinner update itself is sync, but the heavy work it announces is not.
+
+**Lanes — the priority bitmap under the hood.** React 18+ replaced the older "expiration time" model with a **31-bit bitmap** where each bit is one priority level. Bitwise operations (`AND`/`OR`) make priority checks cheap — combining lanes, finding the highest-priority pending lane, and clearing a lane after commit are all single CPU instructions. The scheduler picks the highest-priority pending lane on each tick; lower-priority work can be paused, queued behind a higher-priority update, and resumed when the urgent work completes. A practical consequence: a click in the middle of a long transition immediately preempts that transition, and the transition restarts (not resumes) with the latest state — that's why concurrent rendering is described as *interruptible* rather than *resumable*.
+
+**Time slicing — the 5-millisecond yield.** React's renderer doesn't process the entire fiber tree in one synchronous burst. It does work for **~5ms**, then calls `MessageChannel.postMessage` (a microtask-faster-than-`setTimeout`) to yield back to the browser. The browser handles input, paints, runs other tasks, then schedules React's continuation. This is what keeps a 16-frame budget intact during a heavy render — even a 200ms render is invisible to the user because input events get to run between slices.
+
+**Double buffering — current and work-in-progress trees.** React maintains **two fiber trees**: the **current tree** (what's painted on screen) and a **work-in-progress tree** (what's being computed). Every fiber holds an `alternate` pointer to its counterpart in the other tree. When a render completes, React commits by *swapping* the pointers — an O(1) atomic operation. If a higher-priority update interrupts the work-in-progress tree, React can throw it away without affecting what's on screen. Without double buffering, mid-render interruption would corrupt the visible UI.
+
+**`useOptimistic` — concurrent UI updates without waiting for confirmation.** New in React 19. Lets you render an "expected" state while an async action is pending, with automatic rollback on failure:
+
+```tsx
+const [optimisticTodos, addOptimistic] = useOptimistic(
+  todos,
+  (state, newTodo) => [...state, { ...newTodo, pending: true }],
+);
+
+async function handleAdd(text: string) {
+  addOptimistic({ id: 'temp', text });   // UI updates immediately
+  await server.create(text);              // commit happens; if it throws, React rolls back
+}
+```
+
+This is what powers the "message appears instantly while sending" UX in modern chat apps without manual rollback bookkeeping.
+
+**Tearing — the bug concurrent rendering creates and `useSyncExternalStore` fixes.** Because a render can be paused mid-tree, two parts of the same tree can read different values from an external store (Zustand, Redux without React 18 bindings) — one read happens before a store update, the other after. Result: tree is inconsistent ("torn"). The fix is `useSyncExternalStore`, which subscribes to the external store with React-compatible semantics — React calls the snapshot function once per commit and consistency is guaranteed. Modern Zustand/Redux already wrap this; if you're writing a store from scratch, use it.
 
 ```tsx
 import { useState, useTransition, useDeferredValue, useMemo } from 'react';
@@ -1564,6 +1624,77 @@ Sending less JS to the browser is the biggest performance lever there is. React 
 - **Client Components** (`'use client'`) hydrate and run in the browser — keep these for interactive leaves.
 - **Streaming SSR** (`renderToPipeableStream` / `renderToReadableStream`) sends HTML in chunks as the data resolves, paired with `<Suspense>` boundaries. The browser paints above-the-fold content before the slow data section finishes.
 
+**Selective Hydration — what React 18 changed.** Pre-18, the server had to wait for *all* data before sending HTML, and the client had to download *all* JS before hydrating *any* component. One slow API blocked the whole page; one heavy bundle blocked all interactivity. React 18 made both pieces concurrent.
+
+On the server, components inside `<Suspense fallback={...}>` boundaries can fall back to their fallback HTML and stream the real markup later as data resolves. On the client, `hydrateRoot` hydrates each Suspense boundary independently — the fast components attach event handlers while the slow ones are still loading. Critically, React **prioritizes hydrating the boundary the user just clicked**: if the user clicks a comment thread before its bundle arrived, React promotes that boundary to the top of the queue, dropping in-flight hydration of less-urgent boundaries. The user sees their click respond as soon as the relevant code arrives, not after every component has hydrated.
+
+```tsx
+// Server
+<Suspense fallback={<Header />}>          {/* ships immediately */}
+  <Header />
+</Suspense>
+<Suspense fallback={<CommentsSkeleton />}> {/* streams when comments resolve */}
+  <Comments postId={42} />
+</Suspense>
+<Suspense fallback={<RecsSkeleton />}>     {/* streams when recommendations resolve */}
+  <Recommendations userId={user.id} />
+</Suspense>
+```
+
+Each Suspense boundary is also an independent code-split point: React lazy-loads the JS for that boundary on demand. So it's *both* a data-fetch boundary and a hydration boundary. The mental model: design Suspense boundaries around *user goals* — header, content, comments, sidebar — not technical layers.
+
+**Progressive Hydration — older non-React-built-in flavor.** A general technique that pre-dates React's selective hydration: defer hydration of components that aren't visible or aren't interactive yet. Implementations include hydrating on `IntersectionObserver` (when scrolled into view), on first user interaction (click/hover/focus), or on `requestIdleCallback` (during browser idle). Astro's "client directives" (`client:idle`, `client:visible`, `client:only`) are the canonical example. With React 18+, selective hydration covers most of the use cases, but `client:visible`-style hydration is still useful for far-below-the-fold widgets where you'd rather not even download the JS until the user scrolls.
+
+**Islands Architecture — the radical alternative.** Instead of "ship a React tree and hydrate it," islands ship *plain HTML* with isolated interactive components ("islands") sprinkled in. Each island has its own tiny bundle and hydrates independently — there's no big root tree and no monolithic hydration step. Static content (most of a blog post, a marketing page, a product description) ships as raw HTML with zero JS.
+
+Frameworks: **Astro** (the canonical implementation), **Marko** (eBay), **Eleventy + Preact**, **Fresh** (Deno), and **Qwik** (which goes further with "resumability" — no hydration at all, just lazy event listener attachment). Islands suit content-heavy sites where most of the page is static; SPA-heavy apps with thousands of interactive widgets aren't a great fit.
+
+```
+| Approach              | Initial JS payload         | Best for                           |
+|-----------------------|----------------------------|------------------------------------|
+| SPA (CSR)             | Whole app                  | Highly interactive dashboards      |
+| SSR + full hydration  | Whole app + serialized data| Mixed-interactive content sites    |
+| RSC + selective hyd.  | Only Client Components     | Modern data-heavy apps             |
+| Islands               | Only the islands           | Content-first sites (blogs, docs)  |
+| Resumable (Qwik)      | ~0KB until interaction     | Same as Islands, even leaner       |
+```
+
+**Incremental Static Regeneration (ISR).** Sits between SSG and SSR. The page is pre-rendered at build time (like SSG) but the server can **regenerate** specific pages in the background after a `revalidate` interval, while still serving the cached version to users (stale-while-revalidate). The result: static-fast TTFB plus the ability to update content without a full site rebuild.
+
+```tsx
+// Next.js Pages Router
+export async function getStaticProps() {
+  const post = await fetchPost();
+  return {
+    props: { post },
+    revalidate: 60,    // background-regenerate at most every 60s
+  };
+}
+
+// Next.js App Router — on-demand revalidation
+import { revalidatePath, revalidateTag } from 'next/cache';
+revalidatePath('/blog/[slug]', 'page');   // invalidates a single path
+revalidateTag('posts');                    // invalidates everything tagged 'posts'
+```
+
+ISR shines for blogs, product catalogs, news sites — pages that change occasionally but get massive read traffic. Not appropriate for per-user personalized data (use SSR or RSC instead), and the first user after the revalidation window pays a slightly slower request as the regeneration runs.
+
+**Rendering models on the web — the comparison table.**
+
+```
+| Model           | Renders at      | TTFB    | FCP     | TTI/INP  | SEO  | Best for                       |
+|-----------------|-----------------|---------|---------|----------|------|--------------------------------|
+| CSR (SPA)       | Browser only    | Fast    | Slow    | Slow     | Hard | App shell, dashboards          |
+| SSR             | Server per req  | Slower  | Fast    | Hydration| Good | Personalized, dynamic content  |
+| SSG             | Build time      | Fastest | Fast    | Fast     | Best | Marketing, docs (static)       |
+| ISR             | Build + bg re-gen| Fast   | Fast    | Fast     | Best | High-traffic infrequently changing |
+| Streaming SSR   | Server (chunked)| Fast    | Fast    | Hydration| Good | Large pages with slow data     |
+| RSC             | Server + client | Fast    | Fast    | Less JS  | Best | Modern data-heavy apps         |
+| Islands         | Server + per-island JS| Fast | Fast | Fastest | Best | Content-first sites            |
+```
+
+Pick by what dominates your page: **mostly static content** → SSG or Islands. **Personalized per request** → SSR or RSC. **High-traffic catalog with periodic updates** → ISR. **Highly interactive dashboard** → CSR with route-level lazy loading. Most apps end up using *several* of these — RSC for the layout shell, SSG for marketing pages, CSR for the authenticated dashboard, ISR for the public blog.
+
 ```tsx
 // Server component — runs once on the server, ships zero JS
 async function ProductList() {
@@ -1606,7 +1737,155 @@ Follow these rules of thumb to keep your React app fast.
 
 ---
 
-## 14. Patterns and Best Practices
+## 14. Reconciliation and Fiber
+
+This section is the "what is actually happening when React renders" deep dive. If you only ever use `useState` and JSX, you can skip it; if you debug perf bugs or get asked "explain reconciliation" in interviews, it's the most useful section in the guide.
+
+### 14.1 The Render → Reconcile → Commit pipeline
+
+Every React update goes through three phases. Conflating them is the #1 source of mental-model bugs:
+
+1. **Render phase** — React calls your component functions, building a *new* tree of plain JS objects (React elements). Pure: no DOM mutation, no effects, no side effects of yours allowed.
+2. **Reconciliation** — React compares ("diffs") the new element tree against the previous fiber tree to figure out what actually changed.
+3. **Commit phase** — React applies the diff to the real DOM, runs `useLayoutEffect` synchronously, paints, then runs `useEffect` after paint.
+
+The render phase can be **paused, restarted, or thrown away** in concurrent mode (an interrupting urgent update will just discard a half-finished render). The commit phase is **always synchronous and uninterruptible** — once React starts mutating the DOM, it finishes before yielding. This is why side effects in the render body are forbidden: a discarded render must leave no trace.
+
+### 14.2 The diffing algorithm — three rules
+
+A naive tree diff is O(n³). React achieves practical O(n) by making three opinionated assumptions and refusing to handle the cases that violate them:
+
+```
+1. Different element types → unmount the old, mount fresh.
+   <div> → <span> nukes the entire subtree (including state, refs, DOM).
+2. Same type → keep the DOM node, update its props.
+   Diff continues recursively into children.
+3. Lists are matched by `key`, not by content.
+   Same key + same type → reuse. Different key → unmount + remount.
+```
+
+The reasoning behind rule #1 is harsh but correct: changing `<div>` to `<span>` is so unusual that it's not worth searching for "did the user maybe mean to keep this node?" If you wanted preservation, you'd use the same type and change the prop. The performance cost of the wrong assumption is bounded (one subtree); the gain on the common case (no type change) is enormous.
+
+### 14.3 Type matching — when components survive props changes vs get destroyed
+
+Two questions get conflated in interviews:
+
+- **"Is the component re-rendered?"** — yes, almost always, when the parent re-renders. This is cheap.
+- **"Is the component remounted?"** — almost never. Remount happens only if the element type changes, or if the key changes.
+
+```jsx
+// Same type — props update, hooks/state/DOM survive
+{isLoggedIn ? <Profile name="Ana" /> : <Profile name="Guest" />}
+
+// Different type at the same position — REMOUNT (state/refs/DOM nuked)
+{isLoggedIn ? <Profile /> : <LoginPrompt />}
+
+// Same type, different positions in array
+//   Without keys, position is identity → first slot maps to first slot
+{[...items, item3].map(i => <Item data={i} />)}    // index keys, fragile
+{items.map(i => <Item key={i.id} data={i} />)}     // stable id keys, correct
+```
+
+**The conditional-rendering gotcha that catches everyone:**
+
+```jsx
+{isCompany ? <Input id="company-id" /> : <Input id="person-id" />}
+```
+
+Both branches produce `<Input>` at the same position with the same type. React reuses the DOM node and the component's internal state — so when the user toggles `isCompany`, the half-typed text from one form stays in the *other* form's field. Both branches share the same React fiber.
+
+The fix is to give them different identity:
+
+```jsx
+{isCompany ? <Input key="company" id="company-id" /> : <Input key="person" id="person-id" />}
+```
+
+Different keys at the same position force React to unmount one and mount the other. The state resets correctly.
+
+### 14.4 Why list keys matter at the algorithm level
+
+Without keys, React matches list items **by position**:
+
+```jsx
+{items.map((item, i) => <Row data={item} />)}    // implicit key = index
+```
+
+This is correctness-fine **only if items never reorder, splice, or filter**. The moment you do `setItems(prev => [newItem, ...prev])`, React's reconciliation:
+
+1. Sees `Row` at index 0 with new `data` prop → calls it a prop update on the existing Row.
+2. Sees `Row` at index 1 with the data that *used to be* at index 0 → another prop update.
+3. ...and so on for every row.
+
+The visible result: every row's props "changed," so every memoization is invalidated, every controlled input loses its state, and the whole list re-renders. With `key={item.id}`, React matches by identity — the new item gets a fresh mount, the rest are untouched, and `React.memo` or `useMemo` work as designed.
+
+### 14.5 Fiber — the data structure that makes interruption possible
+
+Pre-React-16, reconciliation was implemented as **recursive synchronous tree traversal**. Each component's render call sat on the JavaScript call stack. The call stack is opaque — you can't pause it, save it, or restart it — so a render had to run to completion or not at all. A 200ms render meant a 200ms blocked main thread.
+
+React 16's Fiber rewrote the call stack as a **linked list of plain JS objects**. Each fiber has pointers to its `child`, `sibling`, and `return` (parent), plus state about its work-in-progress. Walking the tree is now an iterative loop — at any iteration, React can save its position and yield to the browser:
+
+```js
+// Conceptual fiber node
+{
+  type: Profile,                  // function ref or DOM tag
+  stateNode: instance | DOMNode,  // the actual instance/DOM
+  child, sibling, return,         // tree pointers
+  pendingProps, memoizedProps,    // input
+  memoizedState,                  // hooks linked list
+  alternate,                      // counterpart in the other tree (double-buffer)
+  flags,                          // bitmask of work to do (Placement, Update, Deletion...)
+  lanes,                          // priority bitmap
+}
+```
+
+**Why every field matters:**
+
+- **`child`/`sibling`/`return`** — iterative tree walk; React can pause and the next slice picks up at this fiber.
+- **`alternate`** — the **double-buffer** pointer. Each fiber in the current tree has an alternate in the work-in-progress tree (and vice versa). When a render completes, React swaps `current = workInProgress` in O(1).
+- **`pendingProps` vs `memoizedProps`** — enables the "bail out" optimization. If pending equals memoized (and there are no pending hooks updates), React skips re-rendering this fiber entirely.
+- **`flags`** (formerly `effectTag`) — bitmask of what needs to happen at commit time. Placement = insert into DOM, Update = mutate DOM, Deletion = remove. Set during the render phase, applied during commit.
+- **`lanes`** — which priority lanes have pending work in this subtree. Used by the scheduler to pick which fiber to work on next.
+
+### 14.6 The work loop — how React actually traverses
+
+Fiber's work loop is two phases per slice — **begin** (descend into a fiber, build its work-in-progress) and **complete** (bubble back up, attach results to parent). Roughly:
+
+```
+beginWork(fiber):
+  if fiber is bailout-eligible: skip subtree
+  else: render the component, create child fibers, descend to first child
+
+completeWork(fiber):
+  attach DOM nodes / collect side effects into parent
+  if has sibling: switch to sibling, beginWork
+  else: bubble up to return, completeWork
+```
+
+After roughly 5ms of work, React calls `shouldYield()` (which uses `MessageChannel` for a fast yield-to-browser). The browser handles input/paint, then schedules React's continuation. The interrupted fiber's position is just a pointer in the work-in-progress tree — picking up next time costs nothing.
+
+### 14.7 Practical implications
+
+1. **Don't redeclare components inside other components.** Each parent render creates a *new* function reference, which Fiber sees as a new `type`, which triggers unmount + remount of every instance. The bug looks like "my input loses focus on every keystroke."
+
+   ```jsx
+   // BAD
+   function Parent() {
+     const Input = () => <input />;     // new ref every render → remount
+     return <Input />;
+   }
+   ```
+
+2. **Mounting is expensive; updating is cheap.** A change that flips the type unmounts the entire subtree. If you can preserve the type and just change props, do.
+
+3. **Stable list keys are a correctness rule, not just a perf rule.** Index keys silently corrupt component state when items reorder.
+
+4. **`React.memo` is a fiber-level bailout opt-in.** It compares incoming props against `memoizedProps` shallowly; if equal, the begin phase short-circuits the subtree. Without `memo`, React re-runs the function but the bailout logic in Fiber may still skip some work via `pendingProps === memoizedProps` reference equality.
+
+5. **The Profiler's "actual" vs "base" duration** map to the fiber-level cost: actual is the time React actually spent in the begin phase (after bailouts); base is what it would have cost without any bailout. Gap = your memoization is paying off.
+
+---
+
+## 15. Patterns and Best Practices
 
 ### 14.1 Compound Components
 
@@ -1704,7 +1983,7 @@ function Component() {
 
 ---
 
-## 15. React 19 Features
+## 16. React 19 Features
 
 ### 15.1 React Compiler
 
@@ -1785,7 +2064,7 @@ function TodoList({ todos }: { todos: Todo[] }) {
 
 ---
 
-## 16. Interview Questions & Answers
+## 17. Interview Questions & Answers
 
 ### Beginner
 
@@ -2227,7 +2506,7 @@ The React Compiler (React 19) handles most of this automatically when enabled �
 
 ---
 
-## 17. Tricky Output Questions
+## 18. Tricky Output Questions
 
 Practice questions testing your understanding of React rendering behavior, hooks quirks, state batching, and closures.
 

@@ -7,7 +7,7 @@ A comprehensive, modern web app for full-stack developer interview preparation. 
 ## Features
 
 ### Study Content
-- **34 guides across 8 categories** — Front End (11: React, React Native & Apps, Play Store Launch, Redux Toolkit, Redux Saga, TanStack Query, Storybook, Jest & RTL, Frontend Tooling, Browser APIs, React Comparisons), JS & TS (3), Back End (7: Node.js, Express, MongoDB, API Design, Database Schema, CORS, Backend Comparisons), AWS (7: IAM, EC2, S3, Lambda, CloudWatch, Frontend Deployment, AWS Comparisons), Git (2), DSA (1), Behavioral (1), System Design (2)
+- **36 guides across 8 categories** — Front End (13: React, React Native & Apps, Play Store Launch, Redux Toolkit, Redux Saga, TanStack Query, Storybook, Jest & RTL, Frontend Tooling, Browser APIs, Design Patterns, Refactoring & Code Review, React Comparisons), JS & TS (3), Back End (7: Node.js, Express, MongoDB, API Design, Database Schema, CORS, Backend Comparisons), AWS (7: IAM, EC2, S3, Lambda, CloudWatch, Frontend Deployment, AWS Comparisons), Git (2), DSA (1), Behavioral (1), System Design (2)
 - **7 cheat sheets** — React Hooks, JS ES6+, Git Commands, Git Workflows & Advanced, Big-O, CSS Flexbox/Grid, HTTP Status Codes
 - **Mermaid diagrams** — architecture diagrams rendered as interactive visuals
 - **Tricky Output Questions** — "Guess the Output" sections in 10 guides (JavaScript, TypeScript, React, React Native, Redux Saga, Redux Toolkit, Node.js, Express, MongoDB, Browser APIs) totalling 129 questions, each paired with a detailed explanation and followed by a cheat-sheet summary (React's 22 are split into 16 core + 6 Performance Pitfalls; Browser APIs has 12)
@@ -26,7 +26,6 @@ A comprehensive, modern web app for full-stack developer interview preparation. 
 - **Bookmarks** — bookmark any heading or quiz question, dedicated bookmarks page
 - **Study Streak** — daily visit tracking with streak counter and milestone celebrations (confetti at 7, 14, 30, 60, 100 days)
 - **Deep Section Links** — click any heading's link icon to copy a shareable URL with anchor
-- **Text-to-Speech** — read guides aloud with play/pause, speed control, and paragraph highlighting
 
 ### UX
 - **Dark/Light Mode** — system preference detection + manual toggle, persisted
@@ -69,7 +68,6 @@ prephub/
       MermaidBlock.tsx         # Lazy mermaid diagram renderer
       StreakCelebration.tsx    # Streak milestone celebration overlay
       Toast.tsx                # Reusable toast notification
-      TTSControls.tsx          # Text-to-speech playback controls
     hooks/
       useDarkMode.ts           # Theme toggle (localStorage)
       useReadingPrefs.ts       # Font size S/M/L (localStorage)
@@ -77,9 +75,8 @@ prephub/
       useBookmarks.ts          # Bookmark management (localStorage)
       useSpacedRepetition.ts   # SM-2 algorithm scheduling (localStorage)
       useStudyStats.ts         # Streak & gamification stats (localStorage)
-      useTextToSpeech.ts       # Web Speech API wrapper
     content/
-      front-end/               # React, React Native & Apps, Play Store Launch, Redux Toolkit, Redux Saga, TanStack Query, Storybook, Jest & RTL, Frontend Tooling, React Comparisons
+      front-end/               # React, React Native & Apps, Play Store Launch, Redux Toolkit, Redux Saga, TanStack Query, Storybook, Jest & RTL, Frontend Tooling, Browser APIs, Design Patterns, Refactoring & Code Review, React Comparisons
       javascript-and-typescript/ # JavaScript, TypeScript, JS Comparisons
       back-end/                # Node.js, Express, MongoDB, API Design, Database Schema, CORS, Backend Comparisons
       aws/                     # IAM, EC2, S3, Lambda, CloudWatch, Frontend Deployment, AWS Comparisons
@@ -117,7 +114,6 @@ npm run preview    # Preview production build
 | `sr-schedule` | Spaced repetition schedule |
 | `study-stats` | Streak and gamification data |
 | `interview-history` | Past interview sim results |
-| `tts-prefs` | Text-to-speech speed |
 
 ## Deployment
 

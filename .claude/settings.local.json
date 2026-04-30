@@ -40,7 +40,14 @@
       "Bash(qlmanage -t -s 1200 -o . og-image.svg)",
       "Bash(mv og-image.svg.png og-image.png)",
       "Bash(sips -g pixelWidth -g pixelHeight og-image.png)",
-      "Bash(sips --cropToHeightWidth 630 1200 og-image.png)"
+      "Bash(sips --cropToHeightWidth 630 1200 og-image.png)",
+      "WebFetch(domain:web.dev)",
+      "WebFetch(domain:www.patterns.dev)",
+      "WebFetch(domain:www.developerway.com)",
+      "WebFetch(domain:www.greatfrontend.com)",
+      "WebFetch(domain:medium.com)",
+      "WebFetch(domain:dev.to)",
+      "WebFetch(domain:refactoring.guru)"
     ]
   }
 }

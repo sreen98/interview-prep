@@ -2,6 +2,62 @@
 
 ## v1.0.5 (April 2026)
 
+### Removed: Read Aloud (Text-to-Speech)
+
+The Read Aloud / Text-to-Speech feature has been removed. The button on guide pages, the playback controls, the paragraph-highlighting style, and the underlying Web Speech API hook are all gone. Existing `tts-prefs` localStorage keys are left in place but no longer read.
+
+### Behavioral Guide — Major Expansion
+
+The Behavioral guide grew from a STAR-method overview into a comprehensive interview prep resource. Four new sections, plus deeper foundational theory:
+
+- **§3 Alternative Frameworks Beyond STAR** — when STAR doesn't fit, four alternatives with the questions they suit best: **CAR** (compressed, for senior+ candidates), **SOAR** (with an explicit *Obstacle* beat for "tell me about a hard challenge" questions), **PARLA** (Problem / Action / Result / Learning / Application — the reflection-heavy framework, ideal for "tell me about a failure" and Microsoft growth-mindset interviews), and **BAR** (rubric-aligned for Amazon LP / Google GCA / explicit-trait questions). Plus a "when to use which" table.
+- **§7 Company-Specific Behavioral Cultures** — per-company rubric breakdowns for **Amazon** (Leadership Principles, bar raiser, data obsession), **Google** (GCA / RRK / Leadership / Googleyness), **Meta** (Move Fast / Be Bold / Focus on Impact, with a bias-for-action lens), **Microsoft** (growth mindset, learning from failure, customer obsession), **Apple** (detail, craft, secrecy comfort), **Netflix** (high judgment, candor, "keeper test"), and **startups** (many hats, speed under chaos). Closes with a cross-company comparison table of top signals graded vs worst-fit story types.
+- **§9 Handling Tough Questions** — frames and scripts for the questions where candidates typically lie, dodge, or sabotage themselves: "why are you leaving," "tell me about a weakness," "why is there a gap on your résumé," "tell me about a conflict," "tell me about a failure," "what are your salary expectations" (early-round), "what's your current salary," and "where do you see yourself in 5 years."
+- **§10 Salary Negotiation** — the highest-leverage 30 minutes of an engineer's career. Market-data sources (Levels.fyi, Blind, network), the negotiation timeline (verbal offer → written offer → counter), the seven components of total comp (base, signing, equity, refresher, performance bonus, relocation, benefits), what counts as leverage and what doesn't, the negotiation script, seven mistakes to avoid, and when not to negotiate.
+- **§1 Why Behavioral Interviews Matter** — added the empirical research foundation (Janz / Hellervik / Gilmore *Behavior Description Interviewing* 1986, Google's Project Oxygen and Project Aristotle), the three theoretical assumptions structured behavioral interviewing rests on, and concrete framing for why "tell me about a time" works while "what would you do" doesn't.
+
+Sections renumbered: previous 3→4, 4→5, 5→6, 6→8, 7→11, 8→12, 9→13, 10→14, 11→15, with TOC updated to match.
+
+### CORS Guide Expansion
+
+Section 1 (Same-Origin Policy) gained two theory blocks:
+
+- **Why SOP Exists — The Threat Model** — the concrete attack SOP prevents (bank.com cookie-leak via attacker.com fetch), and the three things to internalize (cookies are domain-keyed not page-keyed; the server still ran the request; CORS is the deliberate exception to a default-deny model).
+- **The History — How We Got Here** — timeline from 1995 (Netscape introduces SOP with JavaScript) through 2009 (CORS spec finalized) to 2020+ (COOP/COEP for SharedArrayBuffer + Spectre mitigation), framing SOP as a living security model rather than a fixed rule.
+
+### Storybook Guide Expansion
+
+Section 1 (What is Storybook?) added Component-Driven Development theory:
+
+- **Why Isolation Matters — Component-Driven Development** — three structural problems CDD solves (the "running the whole app to see one button" problem; the "works in this context, breaks in that one" bug; the design/engineering handoff).
+- **Storybook in the broader testing stack** — 4-layer comparison table (Unit / Component / Visual Regression / E2E) showing exactly where Storybook fits and what each layer catches.
+
+### Design Patterns Guide
+
+A new Front End guide: **Design Patterns** — all 23 Gang of Four patterns (Creational, Structural, Behavioral) with JavaScript/TypeScript examples and idiomatic-JS alternatives where the language already solves what the pattern was invented to address. Plus the React-specific canon: Higher-Order Components, Render Props, Custom Hooks, Compound Components, Container/Presentational, Provider, and the Reducer pattern. Closes with anti-patterns to flag in code review (Singleton-as-global-state, Factory of one, HOC pyramids, etc.), a "which pattern when" comparison table, 11 interview questions, and 4 tricky questions on subtle pattern selection trade-offs (Strategy vs Dependency Injection, Strategy vs Template Method, Builder vs Parameter Object, Observer subscribe-return-unsubscriber design).
+
+### Refactoring & Code Review Guide
+
+A new Front End guide: **Refactoring & Code Review** — covers the full refactoring.guru catalog plus modern code review practice:
+
+- **What is refactoring** — the precise definition (behavior-preserving structural improvement), the "two hats" rule, when to refactor (rule of three, before features, fixing bugs, in code review), when not to.
+- **How to refactor safely** — small steps, tests at every step, never mix refactoring with behavior changes in one commit.
+- **Code smells** — full catalog grouped by family: Bloaters (Long Method, Large Class, Primitive Obsession, Long Parameter List, Data Clumps), OO Abusers (Switch Statements, Temporary Field, Refused Bequest, Alternative Classes), Change Preventers (Divergent Change, Shotgun Surgery, Parallel Inheritance), Dispensables (Comments, Duplicate Code, Lazy Class, Data Class, Dead Code, Speculative Generality), Couplers (Feature Envy, Inappropriate Intimacy, Message Chains, Middle Man).
+- **Refactoring techniques** — Composing Methods (Extract Method, Inline, Replace Temp with Query), Moving Features Between Objects (Move Method, Extract Class, Hide Delegate), Simplifying Conditionals (Guard Clauses, Replace Conditional with Polymorphism, Introduce Null Object), Simplifying Method Calls (Introduce Parameter Object, Separate Query from Modifier), Dealing with Generalization (Pull Up, Push Down, Replace Inheritance with Delegation).
+- **React-specific refactorings** — Extract Custom Hook, Extract Component, Move state down, Lift state up, Replace `useEffect`-as-derivation with derivation, Co-location.
+- **Code review** — goals (correctness > design > maintainability > style), full checklist (correctness / design / performance / security / tests / naming / hygiene), comment-prefix conventions (`nit:` / `question:` / `suggestion:` / `issue:` / `blocking:`), how to give and receive feedback, PR hygiene (size, description, commits), 13 anti-patterns to flag without discussion.
+- **12 interview questions** (Beginner/Intermediate/Advanced) on refactoring vs rewriting, rule of three, smells vs bugs, guard clauses, when to comment, refactoring a 200-line component, primitive obsession, Replace Conditional with Polymorphism, the strangler fig pattern, refactoring without tests, async vs pair vs sync code review, and how to decide whether to refactor or accept a smell.
+- **7 tricky questions** on Message Chain diagnosis, Data Clump fixes, Long Parameter List vs Introduce Parameter Object, Extract Method when blocks update enclosing scope, "switch vs polymorphism" reviewer/author dispute, junior PR review judgement (block vs follow-up), and "build vs adopt" library decisions.
+
+### React Guide — Reconciliation, Hydration, and Rendering Models
+
+The React guide grew significantly:
+
+- **New Section 14 "Reconciliation and Fiber"** — a deep dive into how React actually renders. The render → reconcile → commit pipeline, the three-rule diffing algorithm (different types remount, same types reuse, lists matched by `key`), why list keys are a correctness rule and not just a perf rule, the Fiber data structure (linked list, double-buffering via `alternate`, the lanes bitmap), the work loop with its 5ms time-slicing yields via `MessageChannel`, and practical implications (don't redeclare components inside other components; remounting is expensive but updating is cheap).
+- **Section 13.4 (Virtualization)** got the windowing math, fixed-vs-dynamic-height handling, and a side-by-side comparison of react-window, @tanstack/react-virtual, react-virtualized, and react-virtuoso, plus a `content-visibility: auto` note.
+- **Section 13.5 (Concurrent Features)** got the lane priority bitmap explanation, time-slicing 5ms yield mechanics, double-buffering with the `alternate` pointer, `useOptimistic` (React 19), and the tearing problem with `useSyncExternalStore` as the fix.
+- **Section 13.12 (Server Components, SSR, Streaming)** expanded to cover Selective Hydration (priority-promoted hydration on user click), Progressive Hydration (hydrate-on-visible/idle/interaction), Islands Architecture (Astro / Marko / Fresh / Qwik with the SPA-vs-SSR-vs-RSC-vs-Islands comparison), and Incremental Static Regeneration (Next.js `getStaticProps` + `revalidate`, plus `revalidatePath`/`revalidateTag` for on-demand invalidation). Closes with a 7-row rendering-models comparison table (CSR / SSR / SSG / ISR / Streaming SSR / RSC / Islands) keyed by TTFB / FCP / TTI / SEO.
+
 ### Browser APIs Guide
 
 A new Front End guide: **Browser APIs** — a comprehensive walkthrough of the platform APIs every web developer is expected to know, with comparison tables wherever the platform offers multiple options:

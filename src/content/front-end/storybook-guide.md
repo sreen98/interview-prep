@@ -31,9 +31,36 @@ Key benefits:
 - **Component catalog** — browse all components in one place
 - **Design system** — single source of truth for UI components
 
+### Why Isolation Matters — Component-Driven Development
+
+Storybook is the canonical implementation of **Component-Driven Development (CDD)**, an architectural philosophy that flips the traditional UI workflow. Instead of building features top-down (page → sections → components), CDD builds bottom-up: write the smallest reusable components first, compose them into larger ones, then assemble pages from those compositions. The premise: components built in isolation are intrinsically more reusable, more testable, and more visually consistent than components extracted retroactively from feature code.
+
+Three structural problems CDD solves:
+
+1. **The "running the whole app to see one button" problem.** Without isolation, modifying a button means firing up the dev server, signing in, navigating to the page that uses the button, and waiting for hot-reload — for every visual tweak. With Storybook, you have the button on screen with all its variants in two seconds.
+
+2. **The "works in this context, breaks in that one" bug.** A modal that's tested only via the checkout flow may behave differently when used in settings. Storybook forces every component to render *outside* its primary context, surfacing assumptions baked into the surrounding code (parent CSS, redux providers, route params).
+
+3. **The visual-design / engineering handoff.** Designers can review the same component the engineer is building, without a staging environment, without authentication, without a database. The static Storybook build is a deployable artifact that doubles as a design review tool.
+
 ### Who Uses Storybook
 
 Used by teams at GitHub, Airbnb, Mozilla, BBC, Shopify, and thousands of others. It's the most popular tool for component-driven development.
+
+### Storybook in the broader testing stack
+
+Storybook is not a replacement for testing — it's a development environment that *also* enables testing patterns that are hard without isolation. The mature setup has four layers:
+
+```
+| Layer                  | Tool                       | What it catches                          |
+|------------------------|----------------------------|------------------------------------------|
+| Unit tests             | Jest / Vitest + RTL        | Logic, prop handling, conditional render |
+| Component tests        | Storybook + play()         | Interaction flows in isolation           |
+| Visual regression      | Chromatic / Percy / Loki   | Pixel-level UI changes                   |
+| End-to-end             | Playwright / Cypress       | Full user flows, authentication, routes  |
+```
+
+Storybook sits at layers 2 and 3. The play function (§6) drives interaction tests against rendered components; tools like Chromatic compare snapshots of every story across PRs to catch unintended visual changes. Visual regression at the *component* level is much faster and more deterministic than at the *page* level — you're snapshotting one button, not a whole flow.
 
 ---
 

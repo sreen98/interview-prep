@@ -66,6 +66,55 @@ The browser ALLOWS (even without CORS):
 
 > **Key insight:** SOP is enforced by the **browser**, not the server. The server always receives and processes the request — SOP prevents the browser from exposing the response to JavaScript.
 
+### Why SOP Exists — The Threat Model
+
+SOP isn't an arbitrary security choice; it's the foundation of multi-tenant browsing. Without it, *any* site you visited could read every other site you were logged into.
+
+The concrete attack SOP prevents:
+
+```
+1. You log into bank.com → cookie set, you're authenticated.
+2. You visit attacker.com (in another tab, or same tab via a link).
+3. attacker.com's JS calls fetch('https://bank.com/api/balance').
+   The browser dutifully includes your bank cookie (cookies attach
+   based on the request URL's domain, not on the page that issued
+   the request).
+4. WITHOUT SOP: attacker.com reads the response, knows your balance,
+   exfiltrates it to its server. Game over.
+   WITH SOP: bank.com's response comes back, but the browser refuses
+   to expose it to attacker.com's JavaScript. attacker.com sees a
+   network error; it cannot read the body.
+```
+
+Three things to internalize about this threat model:
+
+1. **Cookies are domain-keyed, not page-keyed.** A request *to* `bank.com` carries `bank.com` cookies regardless of which page issued the request. SOP is what stops that from being a catastrophe.
+2. **The server still ran the request.** SOP only blocks the *response* from reaching cross-origin JavaScript. State-changing requests can still be sent (this is the CSRF problem — see §11).
+3. **CORS is the deliberate exception.** SOP is the default deny. CORS lets specific servers say "yes, this origin is allowed to read my response." Without SOP, CORS would make no sense; the entire point of the dance is *opting out of a default block*.
+
+### The History — How We Got Here
+
+```
+1995: Netscape introduces JavaScript and the same-origin policy together.
+      Originally just protecting cookies and document.cookie access.
+
+2006: XMLHttpRequest standardized; SOP applies to it from day one.
+      JSONP emerges as a workaround — exploits the fact that <script>
+      tags are NOT same-origin restricted.
+
+2009: CORS specification finalized — formal, browser-coordinated way to
+      relax SOP for specific cross-origin requests.
+
+2010s: postMessage, Fetch API, modern security headers (CSP, COOP, COEP)
+       layer on top of SOP for richer cross-origin scenarios.
+
+2020+: Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy
+       harden the model further to enable SharedArrayBuffer safely
+       (Spectre mitigation).
+```
+
+The lesson: SOP is a *living* security model. CORS is one part of it; CSP, COOP, COEP, and SameSite cookies are others. They all exist because the browser is the most-attacked client in the world.
+
 ---
 
 ## 2. What is CORS?
