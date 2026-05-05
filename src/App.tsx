@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback, lazy, Suspense } from 'react';
 import { Routes, Route, Link, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -17,21 +17,46 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useDarkMode } from './hooks/useDarkMode';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import type { MenuSection, MenuItem } from './data';
 import { contentFiles, menuStructure, slugify, getTextContent, extractHeadings, escapeRegex, estimateReadingTime, cheatSheets, getAllQuestions } from './data';
 import { useReadingPrefs } from './hooks/useReadingPrefs';
 import { useProgress } from './hooks/useProgress';
 import { useBookmarks } from './hooks/useBookmarks';
 import { useSpacedRepetition } from './hooks/useSpacedRepetition';
 import { useStudyStats } from './hooks/useStudyStats';
-import QuizMode from './components/QuizMode';
-import CodePlayground from './components/CodePlayground';
 import MermaidBlock from './components/MermaidBlock';
-import BookmarksPage from './components/BookmarksPage';
-import ReviewPage from './components/ReviewPage';
-import InterviewSimulator from './components/InterviewSimulator';
-import CheatSheetsIndex from './components/CheatSheetsIndex';
 import StreakCelebration from './components/StreakCelebration';
 import Toast from './components/Toast';
+
+// Route-level code splitting. Each gets its own bundle chunk so users on
+// other routes don't pay for code they aren't using.
+const HomePage           = lazy(() => import('./components/HomePage'));
+const QuizMode           = lazy(() => import('./components/QuizMode'));
+const CodePlayground     = lazy(() => import('./components/CodePlayground'));
+const BookmarksPage      = lazy(() => import('./components/BookmarksPage'));
+const ReviewPage         = lazy(() => import('./components/ReviewPage'));
+const InterviewSimulator = lazy(() => import('./components/InterviewSimulator'));
+const CheatSheetsIndex   = lazy(() => import('./components/CheatSheetsIndex'));
+
+// Loader shown while a lazy route chunk is being fetched.
+// Pulse-skeleton hints at the upcoming page shape so the transition
+// feels quieter than a spinner pop-in.
+const RouteFallback = () => (
+  <div className="px-6 py-12 md:px-12 max-w-5xl mx-auto animate-pulse" aria-busy="true" aria-label="Loading page">
+    <div className="h-8 w-2/3 rounded-lg bg-slate-200 dark:bg-slate-800 mb-4" />
+    <div className="h-4 w-1/2 rounded bg-slate-200 dark:bg-slate-800 mb-10" />
+    <div className="space-y-3">
+      <div className="h-3 w-full rounded bg-slate-200 dark:bg-slate-800" />
+      <div className="h-3 w-11/12 rounded bg-slate-200 dark:bg-slate-800" />
+      <div className="h-3 w-10/12 rounded bg-slate-200 dark:bg-slate-800" />
+      <div className="h-3 w-9/12 rounded bg-slate-200 dark:bg-slate-800" />
+    </div>
+    <div className="mt-8 flex items-center gap-3 text-slate-400">
+      <div className="h-4 w-4 rounded-full border-2 border-slate-300 dark:border-slate-700 border-t-indigo-500 animate-spin" />
+      <span className="text-xs font-medium">Loading…</span>
+    </div>
+  </div>
+);
 
 const GithubIcon = ({ size = 16, ...props }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -40,12 +65,12 @@ const GithubIcon = ({ size = 16, ...props }) => (
   </svg>
 );
 
-function cn(...inputs) {
+function cn(...inputs: (string | false | null | undefined)[]) {
   return twMerge(clsx(inputs));
 }
 
 // Strip the markdown "## Table of Contents" section (the app generates its own TOC)
-function stripMarkdownToc(md) {
+function stripMarkdownToc(md: string): string {
   return md.replace(/^## Table of Contents\n[\s\S]*?(?=\n---\s*\n|\n## )/m, '');
 }
 
@@ -79,14 +104,14 @@ const ReadingProgress = () => {
 
 // ==================== Code Block ====================
 
-const PreBlock = ({ children }) => {
+const PreBlock = ({ children }: { children: React.ReactNode }) => {
   const [copied, setCopied] = useState(false);
-  const ref = useRef(null);
+  const ref = useRef<HTMLPreElement>(null);
   const navigate = useNavigate();
 
   let language = '';
   React.Children.forEach(children, child => {
-    if (React.isValidElement(child)) {
+    if (React.isValidElement<{ className?: string }>(child)) {
       const match = /language-(\w+)/.exec(child.props?.className || '');
       if (match) language = match[1];
     }
@@ -154,7 +179,7 @@ const PreBlock = ({ children }) => {
 
 // ==================== Table of Contents ====================
 
-const TableOfContents = ({ content, isCollapsed, onToggle }) => {
+const TableOfContents = ({ content, isCollapsed, onToggle }: { content: string; isCollapsed: boolean; onToggle: () => void }) => {
   const [activeId, setActiveId] = useState('');
 
   const headings = useMemo(() => {
@@ -242,7 +267,7 @@ const TableOfContents = ({ content, isCollapsed, onToggle }) => {
 };
 
 // Mobile TOC toggle
-const MobileToc = ({ content }) => {
+const MobileToc = ({ content }: { content: string }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const headings = useMemo(() => {
@@ -297,10 +322,10 @@ const MobileToc = ({ content }) => {
 
 // ==================== Search Modal ====================
 
-const SearchModal = ({ isOpen, onClose }) => {
+const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -312,7 +337,7 @@ const SearchModal = ({ isOpen, onClose }) => {
   const results = useMemo(() => {
     if (!query.trim() || query.length < 2) return [];
     const q = query.toLowerCase();
-    const items = [];
+    const items: { name: string; path: string; file: string; category: string; snippet: string; nameMatch: boolean }[] = [];
 
     for (const section of menuStructure) {
       if (!section.items) continue;
@@ -336,7 +361,7 @@ const SearchModal = ({ isOpen, onClose }) => {
     return items.sort((a, b) => (b.nameMatch ? 1 : 0) - (a.nameMatch ? 1 : 0)).slice(0, 10);
   }, [query]);
 
-  const handleSelect = (path) => {
+  const handleSelect = (path: string) => {
     const url = query.trim().length >= 2 ? `${path}?q=${encodeURIComponent(query.trim())}` : path;
     navigate(url);
     onClose();
@@ -424,214 +449,9 @@ const SearchModal = ({ isOpen, onClose }) => {
   );
 };
 
-// ==================== Home Page ====================
-
-const HomePage = () => {
-  const navigate = useNavigate();
-  const categories = menuStructure.filter(s => s.items);
-  const allGuides = menuStructure.flatMap(s => s.items || []);
-  const totalReadTime = allGuides.reduce((sum, g) => sum + estimateReadingTime(contentFiles[g.file] || ''), 0);
-  const { getOverallStats, getCategoryStats, getStatus } = useProgress();
-  const { getStats } = useStudyStats();
-  const overallStats = getOverallStats(allGuides);
-  const studyStats = getStats();
-
-  const handleRandomTopic = () => {
-    const random = allGuides[Math.floor(Math.random() * allGuides.length)];
-    navigate(random.path);
-  };
-
-  return (
-    <div className="px-6 py-12 md:px-12 max-w-5xl mx-auto">
-      {/* Hero */}
-      <div className="text-center mb-14 relative">
-        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-gradient-to-r from-indigo-400/20 via-purple-400/20 to-pink-400/20 dark:from-indigo-400/10 dark:via-purple-400/10 dark:to-pink-400/10 rounded-full blur-3xl pointer-events-none" />
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="relative"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 text-sm font-medium mb-6 border border-indigo-100 dark:border-indigo-900/50">
-            <Sparkles size={14} />
-            <span>Your interview prep companion</span>
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight">
-            <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
-              Master Your Next
-            </span>
-            <br />
-            <span className="text-slate-900 dark:text-white">Interview</span>
-          </h1>
-
-          <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-8 leading-relaxed">
-            {allGuides.length} comprehensive guides covering full-stack development.
-            From React to System Design — everything you need to ace it.
-          </p>
-        </motion.div>
-      </div>
-
-      {/* Quick Actions */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.15 }}
-        className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-14"
-      >
-        <button
-          onClick={handleRandomTopic}
-          className="flex flex-col items-center gap-2.5 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 hover:shadow-lg hover:shadow-indigo-500/10 hover:-translate-y-1 transition-all duration-300 group"
-        >
-          <div className="p-3 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-shadow">
-            <Sparkles size={20} className="text-white" />
-          </div>
-          <span className="text-sm font-semibold">Random Topic</span>
-          <span className="text-[11px] text-slate-400">Feeling lucky?</span>
-        </button>
-
-        <Link
-          to="/quiz"
-          className="flex flex-col items-center gap-2.5 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 hover:shadow-lg hover:shadow-amber-500/10 hover:-translate-y-1 transition-all duration-300 group"
-        >
-          <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 shadow-lg shadow-amber-500/20 group-hover:shadow-amber-500/40 transition-shadow">
-            <Zap size={20} className="text-white" />
-          </div>
-          <span className="text-sm font-semibold">Quiz Mode</span>
-          <span className="text-[11px] text-slate-400">Test yourself</span>
-        </Link>
-
-        <Link
-          to="/playground"
-          className="flex flex-col items-center gap-2.5 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 hover:shadow-lg hover:shadow-emerald-500/10 hover:-translate-y-1 transition-all duration-300 group"
-        >
-          <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/20 group-hover:shadow-emerald-500/40 transition-shadow">
-            <Terminal size={20} className="text-white" />
-          </div>
-          <span className="text-sm font-semibold">Playground</span>
-          <span className="text-[11px] text-slate-400">Run JS code</span>
-        </Link>
-
-        <Link
-          to="/interview"
-          className="flex flex-col items-center gap-2.5 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 hover:shadow-lg hover:shadow-violet-500/10 hover:-translate-y-1 transition-all duration-300 group"
-        >
-          <div className="p-3 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 shadow-lg shadow-violet-500/20 group-hover:shadow-violet-500/40 transition-shadow">
-            <GraduationCap size={20} className="text-white" />
-          </div>
-          <span className="text-sm font-semibold">Interview Sim</span>
-          <span className="text-[11px] text-slate-400">Mock interview</span>
-        </Link>
-      </motion.div>
-
-      {/* Stats Bar */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="flex justify-center gap-6 sm:gap-10 mb-14 py-5 px-6 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800"
-      >
-        {studyStats.currentStreak > 0 && (
-          <div className="text-center">
-            <div className="text-xl sm:text-2xl font-extrabold text-orange-500 flex items-center justify-center gap-1">
-              <Flame size={20} /> {studyStats.currentStreak}
-            </div>
-            <div className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5">Day Streak</div>
-          </div>
-        )}
-        <div className="text-center">
-          <div className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
-            {overallStats.completed}/{overallStats.total}
-          </div>
-          <div className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5">Completed</div>
-        </div>
-        <div className="text-center">
-          <div className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
-            {studyStats.totalQuestionsReviewed}
-          </div>
-          <div className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5">Reviewed</div>
-        </div>
-        <div className="text-center">
-          <div className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
-            {allGuides.length}
-          </div>
-          <div className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5">Guides</div>
-        </div>
-      </motion.div>
-
-      {/* Section Header */}
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white">Study Guides</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Pick a category and start learning</p>
-      </div>
-
-      {/* Category Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
-        {categories.map((cat, i) => {
-          const Icon = cat.icon;
-          const catReadTime = cat.items.reduce((sum, g) => sum + estimateReadingTime(contentFiles[g.file] || ''), 0);
-          return (
-            <motion.div
-              key={cat.name}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 + i * 0.08 }}
-              className="group relative rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 overflow-hidden hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-black/20 transition-all duration-300 hover:-translate-y-1"
-            >
-              <div className={`h-1 bg-gradient-to-r ${cat.gradient}`} />
-              <div className="p-6">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className={cn("p-3 rounded-xl shrink-0", cat.lightBg, cat.darkBg)}>
-                    <Icon className={cat.accent} size={22} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <h3 className="text-lg font-bold">{cat.name}</h3>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
-                          {getCategoryStats(cat.items).completed}/{cat.items.length}
-                        </span>
-                        <span className="text-[11px] text-slate-400 dark:text-slate-500 flex items-center gap-1">
-                          <Clock size={11} />
-                          {catReadTime}m
-                        </span>
-                      </div>
-                    </div>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">{cat.description}</p>
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {cat.items.map(item => {
-                    const s = getStatus(item.path);
-                    return (
-                      <Link
-                        key={item.path}
-                        to={item.path}
-                        className="text-xs px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all font-medium border border-transparent hover:border-slate-200 dark:hover:border-slate-600 inline-flex items-center gap-1.5"
-                      >
-                        {s === 'completed' && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />}
-                        {s === 'in-progress' && <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />}
-                        {item.name}
-                        <span className="text-[10px] text-slate-400 dark:text-slate-500">
-                          {estimateReadingTime(contentFiles[item.file] || '')}m
-                        </span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
-
 // ==================== Official Docs Bar ====================
 
-const OfficialDocsBar = ({ filePath }) => {
+const OfficialDocsBar = ({ filePath }: { filePath: string }) => {
   const guide = useMemo(() => {
     for (const section of menuStructure) {
       if (!section.items) continue;
@@ -667,14 +487,14 @@ const OfficialDocsBar = ({ filePath }) => {
 
 // ==================== Content Page ====================
 
-const ContentPage = ({ filePath, guidePath, guideName }) => {
+const ContentPage = ({ filePath, guidePath, guideName }: { filePath: string; guidePath?: string; guideName?: string }) => {
   const rawContent = contentFiles[filePath] || '# Not Found\n\nThe requested content could not be found.';
   const content = useMemo(() => stripMarkdownToc(rawContent), [rawContent]);
   const location = useLocation();
   const searchQuery = new URLSearchParams(location.search).get('q');
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [highlightCount, setHighlightCount] = useState(0);
-  const [toastMsg, setToastMsg] = useState(null);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [isTocCollapsed, setIsTocCollapsed] = useState(false);
   const { getStatus, markInProgress, toggleComplete } = useProgress();
   const { isBookmarked, toggleBookmark } = useBookmarks();
@@ -695,10 +515,13 @@ const ContentPage = ({ filePath, guidePath, guideName }) => {
   // ===== Feature 1: Related Guides Suggestions =====
   const relatedGuides = useMemo(() => {
     if (!guidePath) return [];
-    // Find current category
-    let currentCategory = null;
+    // Find current category. Narrow to sections that have items so TS
+    // knows the .items property is defined throughout this block.
+    type CategoryWithItems = MenuSection & { items: MenuItem[] };
+    const hasItems = (s: MenuSection): s is CategoryWithItems => Array.isArray(s.items);
+    const categoriesWithItems: CategoryWithItems[] = menuStructure.filter(hasItems);
+    let currentCategory: CategoryWithItems | null = null;
     let currentCategoryIndex = -1;
-    const categoriesWithItems = menuStructure.filter(s => s.items);
     for (let i = 0; i < categoriesWithItems.length; i++) {
       if (categoriesWithItems[i].items.some(item => item.path === guidePath)) {
         currentCategory = categoriesWithItems[i];
@@ -709,7 +532,7 @@ const ContentPage = ({ filePath, guidePath, guideName }) => {
     if (!currentCategory) return [];
 
     // Get other guides from same category
-    let related = currentCategory.items.filter(item => item.path !== guidePath);
+    let related: MenuItem[] = currentCategory.items.filter(item => item.path !== guidePath);
 
     // If fewer than 2, pull from adjacent categories
     if (related.length < 2) {
@@ -750,50 +573,54 @@ const ContentPage = ({ filePath, guidePath, guideName }) => {
 
       const regex = new RegExp(`(${escapeRegex(searchQuery)})`, 'gi');
       const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
-      const textNodes = [];
+      const textNodes: Text[] = [];
 
       while (walker.nextNode()) {
-        const node = walker.currentNode;
-        if (!node.parentElement.closest('pre, code, .code-block, .code-block-header')) {
+        const node = walker.currentNode as Text;
+        const parent = node.parentElement;
+        if (parent && !parent.closest('pre, code, .code-block, .code-block-header')) {
           textNodes.push(node);
         }
       }
 
       let count = 0;
-      let firstMark = null;
+      let firstMark: HTMLElement | null = null;
 
       for (const node of textNodes) {
-        if (regex.test(node.textContent)) {
+        const text = node.textContent ?? '';
+        if (regex.test(text)) {
           regex.lastIndex = 0;
           const span = document.createElement('span');
-          span.innerHTML = node.textContent.replace(regex, '<mark class="search-hl">$1</mark>');
-          node.parentNode.replaceChild(span, node);
+          span.innerHTML = text.replace(regex, '<mark class="search-hl">$1</mark>');
+          node.parentNode?.replaceChild(span, node);
           const mark = span.querySelector('mark');
-          if (mark && !firstMark) firstMark = mark;
-          count += (node.textContent.match(regex) || []).length;
+          if (mark && !firstMark) firstMark = mark as HTMLElement;
+          count += (text.match(regex) || []).length;
         }
       }
 
       setHighlightCount(count);
 
       if (firstMark) {
-        setTimeout(() => firstMark.scrollIntoView({ behavior: 'smooth', block: 'center' }), 200);
+        const target = firstMark;
+        setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 200);
       }
     }, 400);
 
     return () => {
       clearTimeout(timer);
-      containerRef.current?.querySelectorAll('mark.search-hl').forEach(m => {
+      containerRef.current?.querySelectorAll('mark.search-hl').forEach((m: Element) => {
         const parent = m.parentNode;
-        parent.replaceChild(document.createTextNode(m.textContent), m);
+        if (!parent) return;
+        parent.replaceChild(document.createTextNode(m.textContent ?? ''), m);
         parent.normalize();
       });
     };
   }, [searchQuery, filePath]);
 
-  const createHeading = useCallback((level) => {
-    const Tag = `h${level}`;
-    return function HeadingComponent({ children, ...props }) {
+  const createHeading = useCallback((level: number) => {
+    const Tag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+    const HeadingComponent: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({ children, ...props }) => {
       const text = getTextContent(children);
       const id = slugify(text);
       const bookmarkId = guidePath ? `${guidePath.replace(/\//g, '-').slice(1)}__${id}` : null;
@@ -828,6 +655,7 @@ const ContentPage = ({ filePath, guidePath, guideName }) => {
         </Tag>
       );
     };
+    return HeadingComponent;
   }, [guidePath, guideName, isBookmarked, toggleBookmark]);
 
   return (
@@ -886,7 +714,7 @@ const ContentPage = ({ filePath, guidePath, guideName }) => {
               pre({ children }) {
                 // Detect mermaid code blocks
                 const child = React.Children.toArray(children)[0];
-                if (React.isValidElement(child) && child.props?.className?.includes('language-mermaid')) {
+                if (React.isValidElement<{ className?: string; children?: React.ReactNode }>(child) && child.props?.className?.includes('language-mermaid')) {
                   const code = typeof child.props.children === 'string' ? child.props.children : '';
                   return <MermaidBlock chart={code} />;
                 }
@@ -1012,8 +840,8 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [expandedSections, setExpandedSections] = useState({});
-  const [milestone, setMilestone] = useState(null);
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+  const [milestone, setMilestone] = useState<number | null>(null);
   const location = useLocation();
   const isContentPage = location.pathname !== '/' && location.pathname !== '/quiz' && location.pathname !== '/playground' && location.pathname !== '/changelog' && location.pathname !== '/bookmarks' && location.pathname !== '/review' && location.pathname !== '/interview' && !location.pathname.startsWith('/cheatsheets');
   const hasUnreadChangelog = localStorage.getItem('lastSeenChangelog') !== CHANGELOG_VERSION;
@@ -1085,7 +913,7 @@ export default function App() {
   }, [location.pathname]);
 
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         setIsSearchOpen(prev => !prev);
@@ -1102,12 +930,13 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const handleArrowNav = (e) => {
+    const handleArrowNav = (e: KeyboardEvent) => {
       if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
 
       // Don't navigate when focus is in an input, textarea, or search-related element
-      const tag = document.activeElement?.tagName?.toLowerCase();
-      if (tag === 'input' || tag === 'textarea' || tag === 'select' || document.activeElement?.isContentEditable) return;
+      const active = document.activeElement as HTMLElement | null;
+      const tag = active?.tagName?.toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || active?.isContentEditable) return;
 
       const currentIndex = flatGuidePaths.indexOf(location.pathname);
       if (currentIndex === -1) return;
@@ -1126,7 +955,7 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleArrowNav);
   }, [location.pathname, flatGuidePaths, navigate]);
 
-  const toggleSection = (name) => {
+  const toggleSection = (name: string) => {
     setExpandedSections(prev => ({ ...prev, [name]: !prev[name] }));
   };
 
@@ -1240,7 +1069,7 @@ export default function App() {
             <BookOpen size={16} /> Home
           </Link>
 
-          {menuStructure.filter(s => s.items).map((section) => {
+          {menuStructure.filter((s): s is MenuSection & { items: MenuItem[] } => Array.isArray(s.items)).map((section) => {
             const Icon = section.icon;
             const isExpanded = expandedSections[section.name];
             const hasActiveChild = section.items.some(i => i.path === location.pathname);
@@ -1256,7 +1085,7 @@ export default function App() {
                       : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-900"
                   )}
                 >
-                  <Icon size={16} className={cn(hasActiveChild && section.accent)} />
+                  {Icon && <Icon size={16} className={cn(hasActiveChild && section.accent)} />}
                   <span className="flex-1 text-left">{section.name}</span>
                   <ChevronDown size={14} className={cn("transition-transform duration-200", isExpanded && "rotate-180")} />
                 </button>
@@ -1367,27 +1196,29 @@ export default function App() {
 
       {/* Main Content */}
       <main className={cn("flex-1 w-full min-w-0 pt-14 md:pt-0", !isSidebarCollapsed && "md:ml-72")}>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/quiz" element={<QuizMode />} />
-          <Route path="/review" element={<ReviewPage />} />
-          <Route path="/interview" element={<InterviewSimulator />} />
-          <Route path="/playground" element={<CodePlayground />} />
-          <Route path="/bookmarks" element={<BookmarksPage />} />
-          <Route path="/changelog" element={<ContentPage filePath="./content/changelog.md" />} />
-          <Route path="/cheatsheets" element={<CheatSheetsIndex />} />
-          {cheatSheets.map(cs => (
-            <Route key={cs.path} path={cs.path} element={<ContentPage filePath={cs.file} />} />
-          ))}
-          {menuStructure.flatMap(section => section.items || []).map(item => (
-            <Route
-              key={item.path}
-              path={item.path}
-              element={<ContentPage filePath={item.file} guidePath={item.path} guideName={item.name} />}
-            />
-          ))}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <Suspense fallback={<RouteFallback />}>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/quiz" element={<QuizMode />} />
+            <Route path="/review" element={<ReviewPage />} />
+            <Route path="/interview" element={<InterviewSimulator />} />
+            <Route path="/playground" element={<CodePlayground />} />
+            <Route path="/bookmarks" element={<BookmarksPage />} />
+            <Route path="/changelog" element={<ContentPage filePath="./content/changelog.md" />} />
+            <Route path="/cheatsheets" element={<CheatSheetsIndex />} />
+            {cheatSheets.map(cs => (
+              <Route key={cs.path} path={cs.path} element={<ContentPage filePath={cs.file} />} />
+            ))}
+            {menuStructure.flatMap(section => section.items || []).map(item => (
+              <Route
+                key={item.path}
+                path={item.path}
+                element={<ContentPage filePath={item.file} guidePath={item.path} guideName={item.name} />}
+              />
+            ))}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
       </main>
     </div>
   );

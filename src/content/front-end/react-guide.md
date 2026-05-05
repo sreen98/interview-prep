@@ -618,7 +618,38 @@ function useDebounce<T>(value: T, delay: number): T {
 
   return debounced;
 }
+
+// Custom hook for boolean toggle — simplest possible custom hook
+function useToggle(initial = false) {
+  const [value, setValue] = useState(initial);
+  const toggle = useCallback(() => setValue(v => !v), []);
+  return [value, toggle, setValue] as const;
+}
+
+// Usage: const [isOpen, toggleOpen] = useToggle();
+
+// Custom hook for data fetching — the canonical "build one live" interview ask.
+// Note: in production, use TanStack Query / SWR. This is the teaching version.
+function useFetch<T>(url: string) {
+  const [data, setData] = useState<T | null>(null);
+  const [error, setError] = useState<Error | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const ac = new AbortController();
+    setLoading(true);
+    fetch(url, { signal: ac.signal })
+      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+      .then(setData, e => { if (e.name !== 'AbortError') setError(e); })
+      .finally(() => setLoading(false));
+    return () => ac.abort();    // cancel on unmount or url change
+  }, [url]);
+
+  return { data, error, loading };
+}
 ```
+
+**The four custom hooks above are the most-asked patterns in interviews** — `useFetch`, `useDebounce`, `useLocalStorage`, `useToggle`. Senior interviewers often follow up with "build one live" — typically `useFetch` with proper cancellation (the `AbortController` cleanup), or `useDebounce` walked through reasoning step by step. Know the cancellation pattern; that's the senior-level signal.
 
 ---
 
@@ -709,6 +740,76 @@ useEffect(() => {
   return () => { cancelled = true; };
 }, [id]);
 ```
+
+### 7.4 When NOT to Use useEffect
+
+Possibly the highest-leverage senior-level signal in React interviews: knowing that **most uses of `useEffect` you encounter are wrong**. The hook is for *synchronizing with external systems* — DOM APIs, browser APIs, network requests, third-party libraries. It is not for "do this when state changes." Each of the patterns below is something React-newcomers reach for `useEffect` to do; in each case, there is a better answer.
+
+**1. Don't use `useEffect` to derive state from props or other state.**
+
+```tsx
+// BAD — runs an extra render cycle just to compute something
+const [filtered, setFiltered] = useState<Item[]>([]);
+useEffect(() => {
+  setFiltered(items.filter(i => i.name.includes(query)));
+}, [items, query]);
+
+// GOOD — derive directly during render. No extra render, no out-of-sync risk.
+const filtered = items.filter(i => i.name.includes(query));
+
+// If the computation is expensive, memoize:
+const filtered = useMemo(
+  () => items.filter(i => i.name.includes(query)),
+  [items, query],
+);
+```
+
+**2. Don't use `useEffect` for data fetching.** Use a real query library — TanStack Query, SWR, RTK Query, or your framework's data layer (Next.js `loader`, Remix loaders, RSC). Effect-based fetching gets caching, deduplication, retries, race conditions, refetching-on-focus, and stale-while-revalidate all wrong by default.
+
+```tsx
+// BAD — every component re-fetches; no caching, no dedup, race conditions on rapid prop changes
+useEffect(() => { fetch(url).then(r => r.json()).then(setData); }, [url]);
+
+// GOOD — TanStack Query handles caching, dedup, retries, focus-refresh, etc.
+const { data } = useQuery({ queryKey: ['user', id], queryFn: () => fetchUser(id) });
+```
+
+**3. Don't use `useEffect` to "listen" to state changes for UI.** If you find yourself writing `useEffect(() => { if (count === 10) doSomething(); }, [count])`, the action belongs in the *event handler* that incremented `count`, not in an effect that runs after render.
+
+```tsx
+// BAD — effect-as-event-listener
+useEffect(() => {
+  if (formSubmitted) showThankYou();
+}, [formSubmitted]);
+
+// GOOD — fire it where it happens
+function handleSubmit() {
+  setFormSubmitted(true);
+  showThankYou();
+}
+```
+
+**4. Don't reset state with `useEffect`.** Use `key` prop to remount instead.
+
+```tsx
+// BAD — runs an extra render to reset
+useEffect(() => { setSelected(null); }, [userId]);
+
+// GOOD — `key` change remounts the component with fresh state
+<UserProfile key={userId} userId={userId} />
+```
+
+**5. DO use `useEffect` for these.** This is its actual job:
+
+- **Subscribing to external stores** that don't already have a React adapter (`useSyncExternalStore` is even better here).
+- **DOM APIs** that need to run after layout — manually focusing an input, measuring an element, attaching a non-React event listener.
+- **Browser APIs** like `IntersectionObserver`, `MutationObserver`, WebSocket, `setInterval` (with cleanup).
+- **Third-party libraries** that need to be initialized and torn down (Mermaid, Mapbox, charts).
+- **Server synchronization** that's specifically *not* about user actions — heartbeats, presence pings, telemetry.
+
+The senior-engineer mental model: `useEffect` is the **escape hatch** to leave React's pure-render model. If you can solve the problem inside the render model — derivation, event handlers, `key`-based reset — that's almost always the right answer. Reach for `useEffect` only when you genuinely need to step outside.
+
+The official React docs have an entire page titled *"You Might Not Need an Effect"* — a good signal of how often the wrong pattern shows up in real codebases.
 
 ---
 
@@ -970,9 +1071,36 @@ function Header() {
 |----------|---------|
 | Theme, locale, auth user | Context |
 | Simple prop drilling (2-3 levels) | Just pass props |
-| Complex server state (API data) | React Query |
-| Complex client state (many updates) | Redux/Zustand |
+| Complex server state (API data) | TanStack Query / SWR |
+| Complex client state (many updates) | Zustand / Jotai (Redux for legacy) |
 | Form state | React Hook Form |
+
+### 11.3 Server State vs Client State — The Most Important Distinction
+
+The single most useful framing for state management in 2026: **server state and client state are fundamentally different problems and should not share a tool.** Most "Redux is bloat" complaints trace back to teams using one global store for both. Once you split the two, the tool choices become obvious.
+
+```
+| Property              | Client state                | Server state                       |
+|-----------------------|------------------------------|------------------------------------|
+| Source of truth       | The browser                  | The server (database, API)         |
+| Lifetime              | This tab, this session       | Forever, across users              |
+| Sync model            | Set it, it's set             | Cache locally, refresh from server |
+| Concerns              | Reducers, atoms, derivation  | Caching, dedup, refetch, retry,    |
+|                       |                              |   stale-while-revalidate, focus    |
+| Examples              | Selected tab, modal open,    | User profile, product list,        |
+|                       |   form input, theme          |   feed, comments, search results   |
+| Right tool            | Zustand / Jotai / Context    | TanStack Query / SWR / RTK Query   |
+```
+
+The split has three concrete consequences:
+
+1. **Don't put server data in Redux/Zustand.** Caching, deduplication, refetch-on-window-focus, optimistic updates, retry-with-backoff, request cancellation — these are *the entire job* of TanStack Query. Re-implementing them on top of Redux is hundreds of lines of buggy boilerplate.
+
+2. **Client state libraries can be tiny.** Once API data lives in TanStack Query, the remaining "client state" is small — a few booleans, a selected ID, the open modal. Zustand handles this in ~3 KB with no provider tree, no actions, no reducers, no selectors. Atomic libraries (Jotai, Recoil) take the same approach with even smaller scope per atom.
+
+3. **Redux is no longer the default.** Reach for Redux Toolkit only when you have a genuinely large, complex, time-traveled, devtools-required client state — or you're maintaining a legacy codebase. For most new projects in 2026, the stack is **TanStack Query + Zustand** (or Jotai), not Redux.
+
+The interview signal: when asked "what state management would you use," the answer that lands is *"server state goes in TanStack Query, client state in Zustand or Context. Redux only if there's a specific reason."* Whoever blanket-recommends Redux for a greenfield React project in 2026 is signaling they haven't kept up.
 
 ---
 
@@ -1070,6 +1198,23 @@ const handleDelete = useCallback((id: string) => {
   setItems(prev => prev.filter(item => item.id !== id));
 }, []);
 ```
+
+**The identity that interviewers love to test:**
+
+```ts
+useCallback(fn, deps)  ===  useMemo(() => fn, deps)
+```
+
+`useCallback` is literally syntactic sugar over `useMemo` for the function-reference case — same dependency-array semantics, same memoization mechanism, same bailout behavior. Knowing the equivalence proves you understand both hooks rather than just memorizing two recipes.
+
+**When NOT to reach for either** (a senior signal — most devs over-apply these):
+
+- **The component renders are already cheap.** Memoization has its own cost (storing the previous value, running the dep comparison, allocating the closure). For a leaf component that renders in <1ms, the memo is a wash or net-negative.
+- **The dependencies are unstable.** If `useMemo(() => x, [items])` is called with a new `items` array reference every render, the memo never hits its cache and you've added overhead for nothing.
+- **No memoized child consumes the result.** `useCallback(handler, [])` is wasted unless `handler` is passed to a `React.memo`-wrapped child or a hook with stable-reference requirements (`useEffect` deps).
+- **The React Compiler (React 19) is enabled.** It memoizes everything automatically; manual `useMemo` / `useCallback` becomes redundant. Don't strip them out preemptively — but don't add new ones either.
+
+**Rule of thumb:** profile first. If the DevTools Profiler shows a child component re-rendering with referentially-equal props, then memoization helps. If not, the memo is dead weight that costs more than it saves.
 
 ### 13.3 Code Splitting (Lazy Loading)
 
@@ -1985,11 +2130,13 @@ function Component() {
 
 ## 16. React 19 Features
 
-### 15.1 React Compiler
+### 16.1 React Compiler
 
 React 19 includes an automatic compiler that handles memoization. You no longer need `useMemo`, `useCallback`, or `React.memo` in most cases — the compiler inserts them automatically.
 
-### 15.2 Actions
+### 16.2 Actions and useActionState
+
+`Actions` are React 19's answer to form handling and async mutations — they replace the manual loading/error state patterns most devs have rebuilt a hundred times.
 
 ```tsx
 function UpdateName() {
@@ -2013,7 +2160,33 @@ function UpdateName() {
 }
 ```
 
-### 15.3 use() Hook
+The contract: pass an async function and an initial state; React gives you back the latest returned state, an action you wire to `<form action>` (or any element accepting an action), and an `isPending` flag. No more `useState` for the loading flag, no more `try/catch` for the error, no more "wait, did I forget to setLoading(false)?". The interview signal: know the *concept* — async transitions tied to form submission — even if the exact API is new to you.
+
+### 16.3 useFormStatus
+
+The companion to `useActionState`. It reads the submission status of the **nearest enclosing `<form>` from inside any descendant component** — without prop-drilling.
+
+```tsx
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return <button disabled={pending}>{pending ? 'Saving…' : 'Save'}</button>;
+}
+
+function ProfileForm() {
+  return (
+    <form action={updateProfile}>
+      <input name="name" />
+      <SubmitButton />          {/* knows the form is submitting */}
+    </form>
+  );
+}
+```
+
+This is what makes Actions composable. You can build a `<SubmitButton>` once and drop it into any form; it picks up the form's submission state automatically. Pre-19, you'd have prop-drilled the loading flag from the form to every nested button.
+
+The triad to remember as one concept: **`useActionState`** (form-level state machine), **`useFormStatus`** (descendant access to that state), **`useOptimistic`** (instant UI while the action is in flight) — together they're the modern form story.
+
+### 16.4 use() Hook
 
 ```tsx
 // Read a promise during render (with Suspense)
@@ -2032,7 +2205,7 @@ function Theme({ isEnabled }: { isEnabled: boolean }) {
 }
 ```
 
-### 15.4 useOptimistic
+### 16.5 useOptimistic
 
 ```tsx
 function TodoList({ todos }: { todos: Todo[] }) {

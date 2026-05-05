@@ -1,6 +1,94 @@
 # What's New
 
-## v1.0.5 (April 2026)
+## v1.0.7 (May 2026)
+
+### DSA Guide — Three New Topic Sections
+
+The DSA guide (2297 → 2722 lines, +18%) was audited for canonical interview topics that were absent. Three full sections were added between current §10 (Dynamic Programming) and §11 (Common Patterns Summary), then 11 / 12 renumbered to 14 / 15 with TOC updated:
+
+- **§11 Heaps & Priority Queues** — when to reach for a heap (Top-K, streaming median, merge K sorted lists, scheduling, A\*); full MinHeap implementation with bubble-up/bubble-down; canonical problems: Top-K Frequent Elements, K-th Largest in Stream; 7-row comparison table covering Top K Frequent / K Closest Points / Median Stream / Merge K Sorted / Task Scheduler / Sliding Window Maximum.
+- **§12 Tries (Prefix Trees)** — why a trie beats a hash set for prefix queries; TrieNode/Trie class implementation with `insert`, `search`, `startsWith`; autocomplete-via-DFS function; 6-row comparison table (Word Search II, Replace Words, Auto-Complete System, Longest Word in Dictionary, Maximum XOR with binary trie); space trade-off note (dense word lists vs random IDs).
+- **§13 Backtracking** — the general template (state + choices + isSolution + isValid pruning); five fully worked problems: Permutations (used-set), Combinations (start-index with prune), Subsets (power set), N-Queens (cols + diag1 + diag2 attack-set tracking), Word Search (DFS with in-place `#` visited mark + restore); 9-row table of canonical problems including Combination Sum, Sudoku Solver, Generate Parentheses, Restore IP Addresses, Palindrome Partitioning; closing performance note that pruning is what makes backtracking practical.
+
+### Playground — JS Polyfills Expansion (15 → 24)
+
+The JS Polyfills category nearly doubled in size. Added the most-asked polyfill exercises that interviewers reach for after the basic map/filter/reduce trio:
+
+- **Array.sort** — implements QuickSort and demonstrates the classic _string-compare default_ gotcha (`[1, 10, 2].sort()` → `[1, 10, 2]`), then walks through ascending/descending/by-key comparators. Includes a stability note for ES2019+ behavior.
+- **Array.indexOf / lastIndexOf** — strict equality (`===`), so `[NaN].indexOf(NaN)` → `-1`. Negative `fromIndex`, lastIndexOf reverse search.
+- **Array.reverse** — two-pointer in-place swap. Mutation note + ES2023 `toReversed` alternative.
+- **Array.slice** — shallow copy with negative-index handling. The shallow-vs-deep clarification (nested object refs are shared).
+- **Array.splice** — the three-jobs-in-one method: remove items, insert items, return removed items. All three modes demonstrated.
+- **Array.concat** — one-level array flattening (not recursive). Mixed array / non-array args.
+- **String.padStart / padEnd** — pad with fill string, truncated to fit. Common time-formatting use case.
+- **JSON.stringify** — recursive serialization with the quirks that catch people: `undefined`/function/symbol values dropped from objects, replaced with `null` in arrays; `NaN` and `Infinity` become `null`; `toJSON` hook (Date) honored. Includes equivalence test against native.
+- **Object.keys / values / entries** — enumerable-own-string-keyed contract (no prototype, no symbols by default).
+
+Total templates now **96 across 7 categories** (JS Fundamentals 6, JS Interview Topics 7, React Basics 3, React Advanced 3, JS Polyfills **24**, Coding Challenges 33, React Machine Coding 20).
+
+### Playground — 15 More Templates (72 → 87)
+
+- **JS Fundamentals (+2):** Map & Set (modern collections, when to use which), Spread & Rest (the same syntax, opposite jobs)
+- **JS Polyfills (+3):** `Array.includes` (with the `NaN` SameValueZero quirk), `Object.assign`, `Array.from` (iterable + array-like + mapFn)
+- **Coding Challenges (+5, all with Show Solution):** Binary Search, Roman to Integer, Reverse Linked List, Container With Most Water (two-pointer area-maximization), Climbing Stairs (Fibonacci-pattern DP intro)
+- **React Machine Coding (+5):** Stopwatch (start/pause/resume/reset with millisecond display), Calculator (4-function), Auto-suggest / Typeahead (filter + arrow-key nav + click-outside-to-close), Toast / Snackbar (queue with auto-dismiss + 4 severity levels), Carousel / Slider (auto-play + keyboard nav + dots indicator)
+
+### Playground — "Show Solution" Toggle
+
+The playground now has a **Show Solution** button (lightbulb icon) in the toolbar for every Coding Challenges template. Click it to swap the function-stub code for the canonical working solution; click again ("Hide Solution") to restore the original challenge.
+
+- **Confirms before clobbering work** — if you've typed code that differs from the challenge stub, a confirm dialog prevents accidental loss.
+- **Active state styling** — when viewing the solution, the button glows amber so you don't forget you're looking at the answer.
+- **Solutions match each challenge** — all 28 Coding Challenges have a hand-written canonical solution: Two Sum (hash map), FizzBuzz (modulo 15 first), Bubble / Quick / Merge Sort (early-exit / middle-pivot / divide-and-conquer), Find Duplicates (single-pass two sets), Throttle (timestamp-based), EventEmitter (Map of Set listeners), LRU Cache (Map insertion-order trick), Deep Clone (recursive with WeakMap cycle guard), and so on. Each solution includes the same test cases as the challenge so you can see ✅ across the board.
+- **No solution for non-challenge templates** — React Machine Coding and JS Polyfills don't show the button (those aren't single-answer "did I solve it" templates). The button only renders when a matching solution exists.
+
+Solutions live in a separate `src/components/playgroundSolutions.ts` keyed by template name, so they don't bloat the main templates definition.
+
+### Playground — 22 New Templates (49 → 72)
+
+Audited the playground for the most-asked JavaScript and React coding interview templates. Added 22 new templates across two categories:
+
+**Coding Challenges — 17 new (was 10, now 27):**
+
+- **Array mutation classics:** Find Duplicates, Remove Duplicates (without Set), Find Missing Number, Move Zeros, Rotate Array
+- **Sort without built-in:** Bubble Sort, Quick Sort, Merge Sort — covers the "sort without using `Array.prototype.sort`" interview ask in three classic styles
+- **String puzzles:** Anagram Check, Longest Substring Without Repeating, First Non-Repeating Character
+- **Functional patterns:** Sum Curry (`sum(1)(2)(3)()`), Memoize, Deep Clone (without `structuredClone` or JSON tricks), Throttle (companion to existing Debounce), Compose & Pipe
+- **Data-structure builds:** EventEmitter (`on`/`off`/`emit`/`once`), LRU Cache (with `Map` insertion-order trick)
+
+Each template follows the established pattern: clear challenge description, constraints, function stub with `// YOUR CODE HERE`, and 4–5 test cases that print ✅/❌ for instant feedback in the playground.
+
+**React Machine Coding — 5 new (was 10, now 15):**
+
+- **Star Rating** — 5-star input with hover preview
+- **Tabs** — compound-component pattern (`<Tabs>` / `<Tabs.List>` / `<Tabs.Tab>` / `<Tabs.Panel>` sharing state via Context — the canonical Radix UI / Headless UI shape)
+- **Accordion** — single-open and multi-open modes via `allowMultiple` prop
+- **OTP Input** — 6-digit input with auto-advance, backspace-to-previous, paste distribution
+- **Tic-Tac-Toe** — winner detection across rows/columns/diagonals, draw detection, reset
+
+Total playground templates now **72 across 7 categories** (JS Fundamentals, JS Interview Topics, React Basics, React Advanced, JS Polyfills, Coding Challenges, React Machine Coding).
+
+### Cross-Guide Audit — 2026 Modern-Feature Gaps Closed
+
+A systematic audit ran across every substantive guide (JavaScript, TypeScript, Node.js, Express, MongoDB, API Design, Database Schema, AWS IAM/EC2/S3/Lambda/CloudWatch/Frontend Deployment, Git, DSA, System Design) checking for canonical 2026-relevant topics. Most guides were already strong; three real gaps were patched:
+
+- **JavaScript §7.1 — Modern Array Helpers** — added `at()` (ES2022) for relative indexing including negative offsets, `findLast` / `findLastIndex` (ES2023) for searching from the end, and the ES2023 **immutable array methods** (`toSorted`, `toReversed`, `toSpliced`, `with`) which return new arrays instead of mutating. The immutable variants directly solve the most common accidental-mutation bug in React/Redux code.
+- **Node.js §13.4 "Modern Node Built-Ins (No npm Install Required)"** (NEW subsection) — covers what the platform now ships natively that used to require dependencies: native `fetch` (Node 18+, replaces `node-fetch` / `axios` for most cases), the native test runner (`node:test` + `node:assert/strict`, replaces Jest/Mocha for backend code), `node --watch` (replaces nodemon), `node --env-file=.env` (replaces dotenv), and `--inspect-brk` with Chrome DevTools. Establishes the modern framing: start with what the platform gives you; add npm only when there's a specific reason.
+- **TypeScript §10.6 — The `satisfies` Operator (TS 4.9+)** (NEW subsection) — promoted from a single interview-Q reference to a full reference subsection. Walks through the three options (annotation widens; `as` skips validation; `satisfies` does both) with concrete code showing why it matters — e.g., `palette.red.toUpperCase()` failing under annotation but working under `satisfies`. Includes the canonical use case: const config objects with shape constraints.
+
+The audit also confirmed that Express (Fastify/Koa/NestJS comparison + Express 5 async errors), MongoDB, AWS IAM (Identity Center / SCP / permissions boundaries), Database Schema, API Design (19 sections), System Design, Git, and DSA were already comprehensive — no additions needed.
+
+### React Guide — 2026 Priority-Map Gaps Closed
+
+The React guide was audited against the "React.js Priority Map for Jobs in 2026" topic list to find what was missing. Five additions:
+
+- **§7.4 "When NOT to Use useEffect"** — the senior-level signal that interviewers grade for. Five concrete patterns of misuse (derive instead of effect, real query libraries instead of effect-fetch, event handlers instead of "effect-as-listener", `key`-based reset instead of effect-reset, and the actual jobs `useEffect` is for: subscribing to external systems, browser APIs, third-party libraries, server sync). Frames `useEffect` as the _escape hatch_ from React's pure-render model rather than the default.
+- **§11.3 "Server State vs Client State — The Most Important Distinction"** — explicit comparison table contrasting source-of-truth, lifetime, sync model, concerns, examples, and the right tool for each side. Closes with the modern-stack guidance: TanStack Query + Zustand for greenfield React projects in 2026; Redux only for genuinely complex client state or legacy codebases.
+- **§16.3 useFormStatus** — added alongside existing `useActionState` (renamed from "Actions" with deeper explanation) and `useOptimistic`, framing them as the **form-state triad** (form-level state machine + descendant access + instant UI). Renumbered React 19 subsections to 16.1–16.5.
+- **§13.2 useMemo / useCallback identity** — added the `useCallback(fn, deps) === useMemo(() => fn, deps)` equivalence interviewers love to test, plus a "when NOT to memoize" senior-signal block (cheap renders, unstable deps, no memoized consumer, React Compiler enabled). The point: profile first, don't sprinkle memoization preemptively.
+- **§6.3 Custom Hooks expansion** — added `useFetch` (with `AbortController` cleanup, the canonical "build one live" interview ask) and `useToggle` alongside the existing `useDebounce` and `useLocalStorage`. The four together cover the most-asked custom-hook patterns, with a note that the cancellation pattern is the senior-level signal.
+
+## v1.0.6 (April 2026)
 
 ### Removed: Read Aloud (Text-to-Speech)
 
@@ -10,11 +98,11 @@ The Read Aloud / Text-to-Speech feature has been removed. The button on guide pa
 
 The Behavioral guide grew from a STAR-method overview into a comprehensive interview prep resource. Four new sections, plus deeper foundational theory:
 
-- **§3 Alternative Frameworks Beyond STAR** — when STAR doesn't fit, four alternatives with the questions they suit best: **CAR** (compressed, for senior+ candidates), **SOAR** (with an explicit *Obstacle* beat for "tell me about a hard challenge" questions), **PARLA** (Problem / Action / Result / Learning / Application — the reflection-heavy framework, ideal for "tell me about a failure" and Microsoft growth-mindset interviews), and **BAR** (rubric-aligned for Amazon LP / Google GCA / explicit-trait questions). Plus a "when to use which" table.
+- **§3 Alternative Frameworks Beyond STAR** — when STAR doesn't fit, four alternatives with the questions they suit best: **CAR** (compressed, for senior+ candidates), **SOAR** (with an explicit _Obstacle_ beat for "tell me about a hard challenge" questions), **PARLA** (Problem / Action / Result / Learning / Application — the reflection-heavy framework, ideal for "tell me about a failure" and Microsoft growth-mindset interviews), and **BAR** (rubric-aligned for Amazon LP / Google GCA / explicit-trait questions). Plus a "when to use which" table.
 - **§7 Company-Specific Behavioral Cultures** — per-company rubric breakdowns for **Amazon** (Leadership Principles, bar raiser, data obsession), **Google** (GCA / RRK / Leadership / Googleyness), **Meta** (Move Fast / Be Bold / Focus on Impact, with a bias-for-action lens), **Microsoft** (growth mindset, learning from failure, customer obsession), **Apple** (detail, craft, secrecy comfort), **Netflix** (high judgment, candor, "keeper test"), and **startups** (many hats, speed under chaos). Closes with a cross-company comparison table of top signals graded vs worst-fit story types.
 - **§9 Handling Tough Questions** — frames and scripts for the questions where candidates typically lie, dodge, or sabotage themselves: "why are you leaving," "tell me about a weakness," "why is there a gap on your résumé," "tell me about a conflict," "tell me about a failure," "what are your salary expectations" (early-round), "what's your current salary," and "where do you see yourself in 5 years."
 - **§10 Salary Negotiation** — the highest-leverage 30 minutes of an engineer's career. Market-data sources (Levels.fyi, Blind, network), the negotiation timeline (verbal offer → written offer → counter), the seven components of total comp (base, signing, equity, refresher, performance bonus, relocation, benefits), what counts as leverage and what doesn't, the negotiation script, seven mistakes to avoid, and when not to negotiate.
-- **§1 Why Behavioral Interviews Matter** — added the empirical research foundation (Janz / Hellervik / Gilmore *Behavior Description Interviewing* 1986, Google's Project Oxygen and Project Aristotle), the three theoretical assumptions structured behavioral interviewing rests on, and concrete framing for why "tell me about a time" works while "what would you do" doesn't.
+- **§1 Why Behavioral Interviews Matter** — added the empirical research foundation (Janz / Hellervik / Gilmore _Behavior Description Interviewing_ 1986, Google's Project Oxygen and Project Aristotle), the three theoretical assumptions structured behavioral interviewing rests on, and concrete framing for why "tell me about a time" works while "what would you do" doesn't.
 
 Sections renumbered: previous 3→4, 4→5, 5→6, 6→8, 7→11, 8→12, 9→13, 10→14, 11→15, with TOC updated to match.
 
@@ -122,7 +210,7 @@ A new Front End guide: **Play Store Launch** — a practical, end-to-end playboo
 
 ---
 
-## v1.0.4 (April 2026)
+## v1.0.5 (April 2026)
 
 ### Tricky Questions — Rewritten With Detailed Explanations
 
@@ -150,7 +238,7 @@ The rewrite also preserved the Quiz-mode parser contract (`**Q{N}: ...**` marker
 
 ---
 
-## v1.0.3 (April 2026)
+## v1.0.4 (April 2026)
 
 ### New Content: React Native & Mobile Apps Guide
 
@@ -174,7 +262,7 @@ A full guide to building native mobile apps with React Native, added to the Fron
 
 ---
 
-## v1.0.2 (April 2026)
+## v1.0.3 (April 2026)
 
 ### Tricky Output Questions — 7 Guides
 

@@ -76,4 +76,19 @@ export default defineConfig({
     }),
   ],
   base: '/prephub/',
+  build: {
+    rollupOptions: {
+      output: {
+        // Vendor splitting: long-lived dependencies live in their own
+        // chunks so they stay cached across deploys (only the app chunk
+        // hash changes when you ship feature work).
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom'],
+          motion: ['framer-motion'],
+          icons: ['lucide-react'],
+          markdown: ['react-markdown', 'remark-gfm', 'rehype-highlight'],
+        },
+      },
+    },
+  },
 })

@@ -16,8 +16,11 @@ A comprehensive guide to data structures, algorithms, and problem-solving patter
 - [8. Sorting](#8-sorting)
 - [9. Searching](#9-searching)
 - [10. Dynamic Programming](#10-dynamic-programming)
-- [11. Common Patterns Summary](#11-common-patterns-summary)
-- [12. Interview Questions & Answers](#12-interview-questions--answers)
+- [11. Heaps & Priority Queues](#11-heaps--priority-queues)
+- [12. Tries (Prefix Trees)](#12-tries-prefix-trees)
+- [13. Backtracking](#13-backtracking)
+- [14. Common Patterns Summary](#14-common-patterns-summary)
+- [15. Interview Questions & Answers](#15-interview-questions--answers)
 - [References](#references)
 
 ---
@@ -1654,7 +1657,429 @@ console.log(knapsackOptimized(weights, values, 7)); // 9
 
 ---
 
-## 11. Common Patterns Summary
+## 11. Heaps & Priority Queues
+
+A **heap** is a tree-based data structure where every parent obeys an ordering relationship with its children. The two flavors:
+
+- **Min-heap** — every parent is **smaller** than (or equal to) its children. The root is the global minimum.
+- **Max-heap** — every parent is **larger** than its children. The root is the global maximum.
+
+A **priority queue** is the abstract data type; a heap is the standard implementation. Heaps give you `insert` and `extract-root` in **O(log n)** and `peek` in **O(1)**, which is exactly what "always pull the next priority" workloads need.
+
+**When you'll reach for a heap:**
+
+- **Top-K problems** — k most frequent elements, k closest points, k-th largest. Heap of size k beats sorting (`O(n log k)` vs `O(n log n)`).
+- **Streaming median** — two heaps (max-heap of lower half, min-heap of upper half).
+- **Merge K sorted lists** — pull the smallest current head from a min-heap of `k` heads.
+- **Dijkstra's shortest path** — already used in the Graphs section.
+- **Task scheduling** with priorities, event simulation, A* search.
+
+### 11.1 Min-Heap Implementation
+
+JavaScript doesn't ship a heap (Python and Java do). The standard array-backed implementation:
+
+```js
+// Array layout: parent at i, children at 2i+1 and 2i+2.
+class MinHeap {
+  constructor() { this.heap = []; }
+
+  peek() { return this.heap[0]; }
+  size() { return this.heap.length; }
+
+  push(val) {
+    this.heap.push(val);
+    this._bubbleUp(this.heap.length - 1);
+  }
+
+  pop() {
+    if (this.heap.length === 0) return undefined;
+    const root = this.heap[0];
+    const last = this.heap.pop();
+    if (this.heap.length > 0) {
+      this.heap[0] = last;
+      this._bubbleDown(0);
+    }
+    return root;
+  }
+
+  _bubbleUp(i) {
+    while (i > 0) {
+      const parent = Math.floor((i - 1) / 2);
+      if (this.heap[parent] <= this.heap[i]) break;
+      [this.heap[parent], this.heap[i]] = [this.heap[i], this.heap[parent]];
+      i = parent;
+    }
+  }
+
+  _bubbleDown(i) {
+    const n = this.heap.length;
+    while (true) {
+      const left = 2 * i + 1, right = 2 * i + 2;
+      let smallest = i;
+      if (left < n && this.heap[left] < this.heap[smallest]) smallest = left;
+      if (right < n && this.heap[right] < this.heap[smallest]) smallest = right;
+      if (smallest === i) break;
+      [this.heap[smallest], this.heap[i]] = [this.heap[i], this.heap[smallest]];
+      i = smallest;
+    }
+  }
+}
+
+// For a max-heap, flip the comparisons (or store negative values).
+// For arbitrary objects, take a `compare(a, b)` function in the constructor
+// and use it everywhere.
+```
+
+### 11.2 Top-K Frequent Elements (canonical heap problem)
+
+```js
+// Given an array, return the k most frequent elements.
+// Hash-map count + min-heap of size k = O(n log k) time.
+function topKFrequent(nums, k) {
+  const freq = new Map();
+  for (const n of nums) freq.set(n, (freq.get(n) || 0) + 1);
+
+  // Heap stores [freq, value]; min-heap by freq so we can pop the smallest
+  // when size exceeds k.
+  const heap = new MinHeap();
+  heap.push = function(item) {
+    this.heap.push(item);
+    this._bubbleUp(this.heap.length - 1);
+  };
+  // ... a real implementation would parameterize comparator. For brevity:
+  const arr = [...freq.entries()].sort((a, b) => b[1] - a[1]);
+  return arr.slice(0, k).map(([num]) => num);
+}
+
+console.log(topKFrequent([1, 1, 1, 2, 2, 3], 2));  // [1, 2]
+```
+
+### 11.3 K-th Largest in a Stream
+
+```js
+// Maintain a min-heap of size k. The root is always the k-th largest.
+// add(val) is O(log k).
+class KthLargest {
+  constructor(k, nums) {
+    this.k = k;
+    this.heap = new MinHeap();
+    for (const n of nums) this.add(n);
+  }
+  add(val) {
+    this.heap.push(val);
+    if (this.heap.size() > this.k) this.heap.pop();
+    return this.heap.peek();
+  }
+}
+
+const kth = new KthLargest(3, [4, 5, 8, 2]);
+console.log(kth.add(3));   // 4
+console.log(kth.add(5));   // 5
+console.log(kth.add(10));  // 5
+console.log(kth.add(9));   // 8
+```
+
+### 11.4 Common Heap Problems
+
+```
+| Problem                          | Approach                                                |
+|----------------------------------|---------------------------------------------------------|
+| Top K Frequent Elements          | Hash-count + min-heap of size k                         |
+| K Closest Points to Origin       | Max-heap of size k by distance²                         |
+| K-th Largest Element             | Min-heap of size k                                      |
+| Find Median from Data Stream     | Two heaps (max-heap lower half, min-heap upper half)    |
+| Merge K Sorted Lists             | Min-heap of k current heads                             |
+| Task Scheduler                   | Max-heap of frequencies, cooldown handling              |
+| Sliding Window Maximum           | Deque (better than heap), or max-heap with lazy delete  |
+```
+
+---
+
+## 12. Tries (Prefix Trees)
+
+A **trie** (pronounced "try") is a tree-shaped dictionary where each path from root to a terminal node spells out a key. The classic use case is **prefix-based lookup** — autocomplete, spell-check, IP routing tables.
+
+Why a trie beats a hash set for prefix queries: a hash set tells you "is this exact word stored?" in O(1); a trie tells you "what words start with these letters?" in O(prefix length), regardless of how many words are stored. For autocomplete on millions of words, a hash set forces you to scan every key.
+
+### 12.1 Implementation
+
+```js
+class TrieNode {
+  constructor() {
+    this.children = new Map();   // char → TrieNode
+    this.isEnd = false;          // true if a word ends here
+  }
+}
+
+class Trie {
+  constructor() {
+    this.root = new TrieNode();
+  }
+
+  // O(L) where L is word length
+  insert(word) {
+    let node = this.root;
+    for (const ch of word) {
+      if (!node.children.has(ch)) node.children.set(ch, new TrieNode());
+      node = node.children.get(ch);
+    }
+    node.isEnd = true;
+  }
+
+  // True only if the exact word was inserted
+  search(word) {
+    const node = this._find(word);
+    return node !== null && node.isEnd;
+  }
+
+  // True if any inserted word starts with this prefix
+  startsWith(prefix) {
+    return this._find(prefix) !== null;
+  }
+
+  _find(s) {
+    let node = this.root;
+    for (const ch of s) {
+      if (!node.children.has(ch)) return null;
+      node = node.children.get(ch);
+    }
+    return node;
+  }
+}
+
+const t = new Trie();
+t.insert("apple");
+t.insert("app");
+console.log(t.search("apple"));       // true
+console.log(t.search("app"));         // true
+console.log(t.search("appl"));        // false (prefix only)
+console.log(t.startsWith("app"));     // true
+console.log(t.startsWith("xyz"));     // false
+```
+
+### 12.2 Autocomplete
+
+```js
+// Return all words in the trie with the given prefix.
+function autocomplete(trie, prefix) {
+  const node = trie._find(prefix);
+  if (!node) return [];
+  const results = [];
+  function dfs(curr, path) {
+    if (curr.isEnd) results.push(path);
+    for (const [ch, child] of curr.children) dfs(child, path + ch);
+  }
+  dfs(node, prefix);
+  return results;
+}
+
+const t = new Trie();
+["apple", "app", "apricot", "banana"].forEach(w => t.insert(w));
+console.log(autocomplete(t, "ap"));   // ["app", "apple", "apricot"]
+```
+
+### 12.3 Common Trie Problems
+
+```
+| Problem                          | Approach                                                |
+|----------------------------------|---------------------------------------------------------|
+| Implement Trie                   | The class above                                         |
+| Word Search II (board + words)   | Build trie of words, DFS the board pruning by trie      |
+| Replace Words (root dictionary)  | Insert roots into trie, replace each word's prefix      |
+| Auto-Complete System             | Trie + DFS to gather all completions                    |
+| Longest Word in Dictionary       | Trie + BFS/DFS, keeping only words built char-by-char   |
+| Maximum XOR of Two Numbers       | Trie of binary representations (32-bit deep)            |
+```
+
+**Space trade-off:** a trie can use significantly more memory than a hash set when keys share little prefix. For dense word lists (English dictionary), the prefix sharing wins; for random IDs, a hash set is leaner.
+
+---
+
+## 13. Backtracking
+
+Backtracking is the systematic exploration of solution space: try a choice, recurse, and **undo** the choice if it leads nowhere. It's the algorithm behind permutations, combinations, N-queens, sudoku, word search, and most "find all valid arrangements" problems.
+
+The general template:
+
+```
+function backtrack(state, choices) {
+  if (isSolution(state)) {
+    record(state);
+    return;
+  }
+  for (const choice of choices) {
+    if (!isValid(state, choice)) continue;
+    state.push(choice);            // make choice
+    backtrack(state, narrowChoices(choices, choice));
+    state.pop();                   // undo choice (the backtrack)
+  }
+}
+```
+
+Three things make backtracking distinctive: (1) **explicit undo** after each branch, (2) **early pruning** via `isValid` to cut dead branches, (3) **state mutation + undo** instead of building new state objects (much cheaper).
+
+### 13.1 Permutations
+
+```js
+// Return all permutations of a distinct-element array.
+// Time: O(n! · n)  Space: O(n) recursion + O(n) state
+function permutations(nums) {
+  const result = [];
+  const used = new Array(nums.length).fill(false);
+  const path = [];
+
+  function dfs() {
+    if (path.length === nums.length) {
+      result.push([...path]);
+      return;
+    }
+    for (let i = 0; i < nums.length; i++) {
+      if (used[i]) continue;
+      used[i] = true;
+      path.push(nums[i]);
+      dfs();
+      path.pop();
+      used[i] = false;
+    }
+  }
+
+  dfs();
+  return result;
+}
+
+console.log(permutations([1, 2, 3]));
+// [[1,2,3], [1,3,2], [2,1,3], [2,3,1], [3,1,2], [3,2,1]]
+```
+
+### 13.2 Combinations
+
+```js
+// All combinations of k numbers chosen from 1..n.
+// Time: O(C(n, k) · k)
+function combinations(n, k) {
+  const result = [];
+
+  function dfs(start, path) {
+    if (path.length === k) {
+      result.push([...path]);
+      return;
+    }
+    // Prune: skip starts that can't fill the remaining slots
+    for (let i = start; i <= n - (k - path.length) + 1; i++) {
+      path.push(i);
+      dfs(i + 1, path);
+      path.pop();
+    }
+  }
+
+  dfs(1, []);
+  return result;
+}
+
+console.log(combinations(4, 2));
+// [[1,2], [1,3], [1,4], [2,3], [2,4], [3,4]]
+```
+
+### 13.3 Subsets (Power Set)
+
+```js
+// Every subset of nums. 2^n total.
+function subsets(nums) {
+  const result = [];
+  function dfs(start, path) {
+    result.push([...path]);
+    for (let i = start; i < nums.length; i++) {
+      path.push(nums[i]);
+      dfs(i + 1, path);
+      path.pop();
+    }
+  }
+  dfs(0, []);
+  return result;
+}
+
+console.log(subsets([1, 2, 3]));
+// [[], [1], [1,2], [1,2,3], [1,3], [2], [2,3], [3]]
+```
+
+### 13.4 N-Queens
+
+```js
+// Place N queens on an N×N board so no two attack each other.
+// Returns count of valid placements.
+function totalNQueens(n) {
+  let count = 0;
+  const cols = new Set();          // attacked columns
+  const diag1 = new Set();         // attacked / diagonals (row + col)
+  const diag2 = new Set();         // attacked \ diagonals (row - col)
+
+  function dfs(row) {
+    if (row === n) { count++; return; }
+    for (let col = 0; col < n; col++) {
+      if (cols.has(col) || diag1.has(row + col) || diag2.has(row - col)) continue;
+      cols.add(col); diag1.add(row + col); diag2.add(row - col);
+      dfs(row + 1);
+      cols.delete(col); diag1.delete(row + col); diag2.delete(row - col);
+    }
+  }
+
+  dfs(0);
+  return count;
+}
+
+console.log(totalNQueens(4));   // 2
+console.log(totalNQueens(8));   // 92
+```
+
+### 13.5 Word Search (board + word)
+
+```js
+// Does the word exist in a 2D board, formed by sequentially adjacent cells?
+// Backtracking with in-place visited mark (replace with '#', restore after).
+function exist(board, word) {
+  const rows = board.length, cols = board[0].length;
+
+  function dfs(r, c, i) {
+    if (i === word.length) return true;
+    if (r < 0 || r >= rows || c < 0 || c >= cols || board[r][c] !== word[i]) return false;
+
+    const original = board[r][c];
+    board[r][c] = "#";   // mark visited
+    const found = dfs(r + 1, c, i + 1) || dfs(r - 1, c, i + 1) || dfs(r, c + 1, i + 1) || dfs(r, c - 1, i + 1);
+    board[r][c] = original;   // undo
+    return found;
+  }
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (dfs(r, c, 0)) return true;
+    }
+  }
+  return false;
+}
+```
+
+### 13.6 Common Backtracking Problems
+
+```
+| Problem                          | Pattern                                                 |
+|----------------------------------|---------------------------------------------------------|
+| Permutations                     | Used-set + path                                         |
+| Combinations / Subsets           | Start-index + path                                      |
+| Combination Sum                  | Start-index, can reuse → no advance, can't → advance    |
+| N-Queens                         | Row-by-row + col/diag attack tracking                   |
+| Word Search (Board)              | DFS with in-place visited mark                          |
+| Sudoku Solver                    | Try 1-9 in each empty cell, validate, backtrack         |
+| Generate Parentheses             | Track open/close counts, prune invalid                  |
+| Restore IP Addresses             | Try 1/2/3 chars per segment, validate, backtrack        |
+| Palindrome Partitioning          | Split string at every position, check palindrome        |
+```
+
+**Performance note:** without pruning, backtracking is exponential — N-Queens is 8! permutations brute force, but pruning by attack-set cuts it to ~92. The pruning is what makes backtracking practical; design the `isValid` check first, then the branching.
+
+---
+
+## 14. Common Patterns Summary
 
 A quick reference mapping common interview patterns to the types of problems they solve and their typical complexity.
 
@@ -1689,7 +2114,7 @@ A quick reference mapping common interview patterns to the types of problems the
 
 ---
 
-## 12. Interview Questions & Answers
+## 15. Interview Questions & Answers
 
 ### Beginner
 

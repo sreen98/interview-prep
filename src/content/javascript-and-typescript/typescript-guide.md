@@ -1118,6 +1118,58 @@ addUSD(dollars, dollars);                 // OK
 // addUSD(dollars, euros);                // Error: EUR is not USD
 ```
 
+### 10.6 The `satisfies` Operator (TS 4.9+)
+
+`satisfies` is the answer to a long-standing TypeScript dilemma: how do you check that a value matches a type *without losing the precise inferred shape* of that value? Before `satisfies`, you had to choose between **type annotation** (validates but widens) or **`as` cast** (preserves the shape but skips validation). `satisfies` does both — validates *and* preserves.
+
+```ts
+type Colors = Record<string, string | RGB>;
+type RGB = [number, number, number];
+
+// Option 1 — type annotation: validates, but widens. The compiler
+// forgets that 'red' is a tuple specifically; it now thinks every
+// value could be string | RGB.
+const palette1: Colors = {
+  red: [255, 0, 0],
+  green: '#00ff00',
+};
+palette1.red.toUpperCase();      // ❌ Error — could be RGB tuple
+palette1.green.toUpperCase();    // ❌ Error — could be RGB tuple
+
+// Option 2 — `as` cast: preserves shape, but no validation.
+// Typo? Wrong type? You won't find out.
+const palette2 = {
+  read: [255, 0, 0],             // typo not caught
+  green: '#00ff00',
+} as Colors;
+
+// Option 3 — `satisfies`: validates the value matches Colors AND
+// preserves the exact inferred shape (red: tuple, green: string).
+const palette3 = {
+  red: [255, 0, 0],
+  green: '#00ff00',
+} satisfies Colors;
+
+palette3.red[0];                 // ✅ number — TS knows red is a tuple
+palette3.green.toUpperCase();    // ✅ string — TS knows green is a string
+// palette3.blue;                // ❌ Error: doesn't exist
+// palette3.red.push(0);         // ❌ Error: tuple has fixed length
+
+// Const objects with shape constraints — the canonical use case
+const config = {
+  api: 'https://api.example.com',
+  timeout: 5000,
+  features: { darkMode: true, beta: false },
+} satisfies Record<string, unknown>;
+
+config.api.toUpperCase();        // ✅ string
+config.features.darkMode;        // ✅ boolean — exact key preserved
+```
+
+**Why interviewers ask about it:** `satisfies` is the cleanest distillation of TypeScript's tension between *type checking* and *type inference*. Knowing it shows you understand how widening works under type annotations, which is a deeper conceptual point than just "I used the operator."
+
+Use `satisfies` whenever you'd otherwise write `as Foo` for a const config object — you get the same shape preservation plus actual validation. Use `:` annotation when you genuinely want widening (e.g., a function parameter typed as `Colors` should accept any `Colors` value, not just one specific shape).
+
 ---
 
 ## 11. Classes

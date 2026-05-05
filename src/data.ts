@@ -14,6 +14,9 @@ export interface MenuItem {
   path: string;
   file: string;
   officialDocs?: OfficialDoc[];
+  // Index signature lets MenuItem flow into hooks that accept generic
+  // `{ path: string; [key: string]: unknown }` shapes (e.g. ProgressItem).
+  [key: string]: unknown;
 }
 
 export interface MenuSection {
@@ -44,6 +47,9 @@ export interface Question {
   guide: string;
   type: 'output' | 'conceptual';
   difficulty?: string;
+  // Index signature for compatibility with useSpacedRepetition's
+  // `{ id: string; [key: string]: unknown }` shape.
+  [key: string]: unknown;
 }
 
 export interface Heading {

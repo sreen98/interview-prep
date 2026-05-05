@@ -829,6 +829,76 @@ setInterval(() => {
 // - Caching without bounds
 ```
 
+### 13.4 Modern Node Built-Ins (No npm Install Required)
+
+Node 18+ shipped a wave of features that replace popular npm packages. Knowing them is a 2026 baseline — the answer to "how do you fetch in Node?" is no longer "install `node-fetch`."
+
+**Native `fetch` (Node 18+)** — the same WHATWG Fetch API the browser provides, available globally with no import. Powered by Undici under the hood.
+
+```js
+// Drop-in browser-compatible fetch
+const res = await fetch('https://api.example.com/users', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ name: 'Ana' }),
+});
+if (!res.ok) throw new Error(`HTTP ${res.status}`);
+const data = await res.json();
+
+// AbortSignal works the same way as in the browser
+const controller = new AbortController();
+setTimeout(() => controller.abort(), 5000);
+const r = await fetch(url, { signal: controller.signal });
+```
+
+`node-fetch`, `axios`, and `got` are now mostly historical — keep them only if you need a feature native fetch lacks (file uploads with progress, retries, interceptors). For everything else, just call `fetch`.
+
+**Native test runner — `node:test` (Node 18+, stable in 20)** — replaces Jest/Mocha for projects that don't need the heavier feature set. Zero config, zero dependencies, fast.
+
+```js
+// test/math.test.mjs
+import { test, describe, it, before } from 'node:test';
+import assert from 'node:assert/strict';
+import { add } from '../src/math.js';
+
+describe('add', () => {
+  before(() => { /* setup */ });
+  it('adds two numbers', () => {
+    assert.equal(add(2, 3), 5);
+  });
+  it('handles negatives', () => {
+    assert.equal(add(-2, -3), -5);
+  });
+});
+
+// Run: node --test
+// Or with watch + coverage:
+//   node --test --watch --experimental-test-coverage
+```
+
+When to keep Jest/Vitest: snapshot testing, jsdom for DOM tests, mock-module support, or you're already on Vitest for the speed. When to switch to `node:test`: server/library code with no DOM, you want zero deps, you want the same runner used by Node core itself.
+
+**`node --watch` (Node 18.11+)** — replaces `nodemon` for most cases. Restarts the process on file change.
+
+```bash
+node --watch src/index.js              # auto-restart on change
+node --watch-path=./src src/index.js   # watch specific paths
+```
+
+**`node --env-file=.env` (Node 20.6+)** — replaces `dotenv` for loading env files. No `require('dotenv').config()` needed.
+
+```bash
+node --env-file=.env src/index.js
+```
+
+**Native `--inspect-brk` and Chrome DevTools** — replaces `node-inspector`. Just point Chrome at `chrome://inspect`.
+
+```bash
+node --inspect-brk src/index.js   # break before user code
+```
+
+**The 2026 baseline:** for new Node projects, start with native fetch + `node:test` + `node --watch` + `node --env-file`. You may add npm dependencies later, but the bar is "what does the platform give me first." That's the framing interviewers grade on.
+
 ---
 
 ## 14. Interview Questions & Answers

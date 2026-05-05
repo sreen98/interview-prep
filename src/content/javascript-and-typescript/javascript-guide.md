@@ -547,6 +547,30 @@ nums.slice(1, 3);                      // [2, 3]
 
 // concat
 [1, 2].concat([3, 4]);                // [1, 2, 3, 4]
+
+// at - relative indexing including negative (ES2022)
+[10, 20, 30].at(0);                   // 10
+[10, 20, 30].at(-1);                  // 30  (cleaner than arr[arr.length - 1])
+
+// findLast / findLastIndex - search from the end (ES2023)
+[1, 5, 3, 5, 7].findLast(n => n === 5);       // 5  (last match)
+[1, 5, 3, 5, 7].findLastIndex(n => n === 5);  // 3  (last match's index)
+
+// Array.from - convert iterable / array-like to array
+Array.from('abc');                    // ['a', 'b', 'c']
+Array.from({ length: 3 }, (_, i) => i * 2);  // [0, 2, 4]
+```
+
+**ES2023 immutable array methods** — `toSorted`, `toReversed`, `toSpliced`, `with` — return *new* arrays instead of mutating. The single biggest source of accidental React/Redux mutation bugs is `arr.sort()` (mutates) used inline; the new `arr.toSorted()` solves it cleanly:
+
+```js
+const nums = [3, 1, 2];
+nums.toSorted();                      // [1, 2, 3]  — new array
+nums;                                 // [3, 1, 2]  — original untouched
+
+[1, 2, 3].toReversed();               // [3, 2, 1]
+[1, 2, 3].with(1, 99);                // [1, 99, 3]  — replace at index
+[1, 2, 3].toSpliced(1, 1, 'x', 'y');  // [1, 'x', 'y', 3]
 ```
 
 ### 7.2 Array Methods (Mutating)
