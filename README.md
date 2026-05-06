@@ -7,10 +7,10 @@ A comprehensive, modern web app for full-stack developer interview preparation. 
 ## Features
 
 ### Study Content
-- **36 guides across 8 categories** — Front End (13: React, React Native & Apps, Play Store Launch, Redux Toolkit, Redux Saga, TanStack Query, Storybook, Jest & RTL, Frontend Tooling, Browser APIs, Design Patterns, Refactoring & Code Review, React Comparisons), JS & TS (3), Back End (7: Node.js, Express, MongoDB, API Design, Database Schema, CORS, Backend Comparisons), AWS (7: IAM, EC2, S3, Lambda, CloudWatch, Frontend Deployment, AWS Comparisons), Git (2), DSA (1), Behavioral (1), System Design (2)
+- **37 guides across 8 categories** — Front End (13: React, React Native & Apps, Play Store Launch, Redux Toolkit, Redux Saga, TanStack Query, Storybook, Jest & RTL, Frontend Tooling, Browser APIs, Design Patterns, Refactoring & Code Review, React Comparisons), JS & TS (3), Back End (8: Node.js, Express, MongoDB, API Design, Database Schema, CORS, Stripe Integration, Backend Comparisons), AWS (7: IAM, EC2, S3, Lambda, CloudWatch, Frontend Deployment, AWS Comparisons), Git (2), DSA (1), Behavioral (1), System Design (2)
 - **7 cheat sheets** — React Hooks, JS ES6+, Git Commands, Git Workflows & Advanced, Big-O, CSS Flexbox/Grid, HTTP Status Codes
 - **Mermaid diagrams** — architecture diagrams rendered as interactive visuals
-- **Tricky Output Questions** — "Guess the Output" sections in 10 guides (JavaScript, TypeScript, React, React Native, Redux Saga, Redux Toolkit, Node.js, Express, MongoDB, Browser APIs) totalling 129 questions, each paired with a detailed explanation and followed by a cheat-sheet summary (React's 22 are split into 16 core + 6 Performance Pitfalls; Browser APIs has 12)
+- **Tricky Output Questions** — "Guess the Output" sections in 11 guides (JavaScript, TypeScript, React, React Native, Redux Saga, Redux Toolkit, Node.js, Express, MongoDB, Browser APIs, Stripe) totalling 135 questions, each paired with a detailed explanation and followed by a cheat-sheet summary (React's 22 are split into 16 core + 6 Performance Pitfalls; Browser APIs has 12; Stripe has 6 scenario questions including the coupon race condition)
 - **Syntax-highlighted code blocks** with copy and "Try it" buttons
 - **Reading time estimates** on every guide
 - **Table of Contents** — auto-generated from headings, tracks active section while scrolling

@@ -1,6 +1,12 @@
 # What's New
 
-## v1.0.7 (May 2026)
+## v1.0.8 (May 2026)
+
+### Stripe Integration Guide
+
+A new Back End guide: **Stripe Integration** — full backend-engineer playbook for handling payments. Covers the API key model (publishable / secret / restricted / webhook signing), the client-server split that keeps you out of PCI scope, the three integration paths (Elements, Checkout, Payment Element), the PaymentIntent state machine, webhook handling (signature verification, idempotency, replay protection), idempotency keys and how to scope them to business operations, Customers and saved payment methods (`off_session`), Subscriptions lifecycle and dunning, **Coupons and Promotion Codes including the coupon race-condition deep dive** (defense in depth: Stripe's atomic `max_redemptions` cap, application-side reservations with TTL + UNIQUE constraint, and idempotency keys at the redemption call), Refunds and Disputes, Strong Customer Authentication / 3D Secure, Stripe Connect for marketplaces, PCI scope (SAQ A, A-EP, D), testing with the Stripe CLI. Closes with **16 interview questions** (Beginner / Intermediate / Advanced) and **6 tricky scenario questions** including the coupon race condition, double-click idempotency, why first-failed-invoice shouldn't revoke access, DB / Stripe state divergence, transactional webhook handlers via the outbox pattern, and dispute response strategy.
+
+## v1.0.7
 
 ### DSA Guide — Three New Topic Sections
 

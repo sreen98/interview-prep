@@ -11,7 +11,7 @@ import {
   PanelLeftClose, PanelLeftOpen, ExternalLink, Type, Clock,
   Link2, Bookmark, BookmarkCheck, Flame, GraduationCap,
   RotateCcw, FileText, CheckCircle, Circle,
-  ScrollText
+  ScrollText, Lock
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDarkMode } from './hooks/useDarkMode';
@@ -37,6 +37,7 @@ const BookmarksPage      = lazy(() => import('./components/BookmarksPage'));
 const ReviewPage         = lazy(() => import('./components/ReviewPage'));
 const InterviewSimulator = lazy(() => import('./components/InterviewSimulator'));
 const CheatSheetsIndex   = lazy(() => import('./components/CheatSheetsIndex'));
+const AdminPage          = lazy(() => import('./components/AdminPage'));
 
 // Loader shown while a lazy route chunk is being fetched.
 // Pulse-skeleton hints at the upcoming page shape so the transition
@@ -1181,7 +1182,7 @@ export default function App() {
           </div>
         </nav>
 
-        <div className="p-4 border-t border-slate-100 dark:border-slate-800/50">
+        <div className="p-4 border-t border-slate-100 dark:border-slate-800/50 space-y-0.5">
           <a
             href="https://github.com/sreen98/prephub"
             target="_blank"
@@ -1191,6 +1192,18 @@ export default function App() {
             <GithubIcon size={16} />
             <span>View on GitHub</span>
           </a>
+          <Link
+            to="/admin"
+            className={cn(
+              "flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all",
+              location.pathname === '/admin'
+                ? "bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300"
+                : "text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-900"
+            )}
+          >
+            <Lock size={14} />
+            <span>Admin</span>
+          </Link>
         </div>
       </aside>
 
@@ -1206,6 +1219,7 @@ export default function App() {
             <Route path="/bookmarks" element={<BookmarksPage />} />
             <Route path="/changelog" element={<ContentPage filePath="./content/changelog.md" />} />
             <Route path="/cheatsheets" element={<CheatSheetsIndex />} />
+            <Route path="/admin" element={<AdminPage />} />
             {cheatSheets.map(cs => (
               <Route key={cs.path} path={cs.path} element={<ContentPage filePath={cs.file} />} />
             ))}
